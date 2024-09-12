@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -15,6 +16,19 @@ public class ChessPiece {
         return "ChessPiece{" +
                 "piece=" + type +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return type == that.type && color == that.color;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, color);
     }
 
     private final ChessPiece.PieceType type;
@@ -63,6 +77,9 @@ public class ChessPiece {
         switch (type) {
             case BISHOP:
                 possibleMoves = (ArrayList<ChessMove>) bishopMoves(board, myPosition);
+                break;
+            case ROOK:
+                //
         }
         return possibleMoves;
     }
@@ -72,15 +89,15 @@ public class ChessPiece {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        moves.addAll(upRight(row, col, myPosition));
-        moves.addAll(upLeft(row, col, myPosition));
-        moves.addAll(downRight(row, col, myPosition));
-        moves.addAll(downLeft(row, col, myPosition));
+        moves.addAll(upRight(row, col, myPosition, board));
+        moves.addAll(upLeft(row, col, myPosition, board));
+        moves.addAll(downRight(row, col, myPosition, board));
+        moves.addAll(downLeft(row, col, myPosition, board));
 
         return moves;
     }
 
-    private Collection<? extends ChessMove> downLeft(int row, int col, ChessPosition myPosition) {
+    private Collection<? extends ChessMove> downLeft(int row, int col, ChessPosition myPosition, ChessBoard board) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int r = row;
         int c = col;
@@ -88,12 +105,22 @@ public class ChessPiece {
             r--;
             c--;
             ChessPosition newPosition = new ChessPosition(r,c);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition)==null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).color != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
-    private Collection<? extends ChessMove> downRight(int row, int col, ChessPosition myPosition) {
+    private Collection<? extends ChessMove> downRight(int row, int col, ChessPosition myPosition, ChessBoard board) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int r = row;
         int c = col;
@@ -101,12 +128,22 @@ public class ChessPiece {
             r--;
             c++;
             ChessPosition newPosition = new ChessPosition(r,c);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition)==null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).color != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
-    private Collection<? extends ChessMove> upLeft(int row, int col, ChessPosition myPosition) {
+    private Collection<? extends ChessMove> upLeft(int row, int col, ChessPosition myPosition, ChessBoard board) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int r = row;
         int c = col;
@@ -114,12 +151,24 @@ public class ChessPiece {
             r++;
             c--;
             ChessPosition newPosition = new ChessPosition(r,c);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+//            ChessMove move = new ChessMove(myPosition, newPosition, null);
+//            moves.add(move);
+            if (board.getPiece(newPosition)==null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).color != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
-    private ArrayList<ChessMove> upRight(int row, int col, ChessPosition myPosition) {
+    private ArrayList<ChessMove> upRight(int row, int col, ChessPosition myPosition, ChessBoard board) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int r = row;
         int c = col;
@@ -127,8 +176,18 @@ public class ChessPiece {
             r++;
             c++;
             ChessPosition newPosition = new ChessPosition(r,c);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition)==null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).color != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
