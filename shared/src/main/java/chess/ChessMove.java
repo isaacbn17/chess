@@ -12,7 +12,7 @@ public class ChessMove {
     @Override
     public String toString() {
         return startPosition +
-                ":" + endPosition;
+                ":" + endPosition + "Promotion piece:" + promotionPiece;
     }
     @Override
     public boolean equals(Object o) {

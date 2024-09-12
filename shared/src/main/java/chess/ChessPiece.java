@@ -96,21 +96,13 @@ public class ChessPiece {
         if (color == ChessGame.TeamColor.WHITE) {
             ArrayList<ChessMove> possibleMoves = forward(board, myPosition);
             if (possibleMoves != null) {
-                for (ChessMove move : possibleMoves) {
-                    if (move != null) {
-                        moves.add(move);
-                    }
-                }
+                moves.addAll(possibleMoves);
             }
         }
         else {
             ArrayList<ChessMove> possibleMoves = backward(board, myPosition);
             if (possibleMoves != null) {
-                for (ChessMove move : possibleMoves) {
-                    if (move != null) {
-                        moves.add(move);
-                    }
-                }
+                moves.addAll(possibleMoves);
             }
         }
         return moves;
@@ -133,8 +125,11 @@ public class ChessPiece {
         }
         ChessPosition newPosition = new ChessPosition(row-1, col);
         if (board.getPiece(newPosition) == null) {
-            if (row==8) {
+            if (row==2) {
                 moves.add(new ChessMove(myPosition, newPosition, PieceType.QUEEN));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.KNIGHT));
                 return moves;
             }
             moves.add(new ChessMove(myPosition, newPosition, null));
@@ -160,8 +155,11 @@ public class ChessPiece {
         }
         ChessPosition newPosition = new ChessPosition(row+1, col);
         if (board.getPiece(newPosition) == null) {
-            if (row==8) {
+            if (row==7) {
                 moves.add(new ChessMove(myPosition, newPosition, PieceType.QUEEN));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, newPosition, PieceType.KNIGHT));
                 return moves;
             }
             moves.add(new ChessMove(myPosition, newPosition, null));
