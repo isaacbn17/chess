@@ -93,30 +93,43 @@ public class ChessPiece {
 
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        moves.add(forward(board, myPosition));
+        if (color == ChessGame.TeamColor.WHITE) {
+            ChessMove move = forward(board, myPosition);
+            if (move != null) {
+                moves.add(move);
+            }
+        }
+        else {
+            ChessMove move = backward(board, myPosition);
+            if (move != null) {
+                moves.add(move);
+            }
+        }
         return moves;
     }
 
+    private ChessMove backward(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        ChessPosition newPosition = new ChessPosition(row-1, col);
+        if (board.getPiece(newPosition) == null) {
+            if (row==1) {
+                return (new ChessMove(myPosition, newPosition, PieceType.QUEEN));
+            }
+            return (new ChessMove(myPosition, newPosition, null));
+        }
+        return null;
+    }
+
     private ChessMove forward(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         ChessPosition newPosition = new ChessPosition(row+1, col);
         if (board.getPiece(newPosition) == null) {
-            if (color == ChessGame.TeamColor.WHITE) {
-                if (row==8) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
-                    moves.add(move);
-                }
-                return (new ChessMove(myPosition, newPosition, null));
+            if (row==8) {
+                return (new ChessMove(myPosition, newPosition, PieceType.QUEEN));
             }
-            else if (color == ChessGame.TeamColor.BLACK) {
-                if (row==1) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
-                    moves.add(move);
-                }
-                return (new ChessMove(myPosition, newPosition, null));
-            }
+            return (new ChessMove(myPosition, newPosition, null));
         }
         return null;
     }
