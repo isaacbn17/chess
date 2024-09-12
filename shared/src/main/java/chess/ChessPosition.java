@@ -11,7 +11,7 @@ import java.util.Objects;
 public class ChessPosition {
   @Override
   public String toString() {
-    return row + ":" + col;
+    return row + "" + col;
   }
 
   @Override

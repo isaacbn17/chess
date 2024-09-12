@@ -80,8 +80,27 @@ public class ChessPiece {
                 break;
             case ROOK:
                 possibleMoves = rookMoves(board, myPosition);
+                break;
+            case QUEEN:
+                possibleMoves = queenMoves(board, myPosition);
         }
         return possibleMoves;
+    }
+
+    private ArrayList<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        moves.addAll(Right(board, myPosition));
+        moves.addAll(Left(board, myPosition));
+        moves.addAll(Up(board, myPosition));
+        moves.addAll(Down(board, myPosition));
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        moves.addAll(upRight(row, col, myPosition, board));
+        moves.addAll(upLeft(row, col, myPosition, board));
+        moves.addAll(downRight(row, col, myPosition, board));
+        moves.addAll(downLeft(row, col, myPosition, board));
+
+        return moves;
     }
 
     private ArrayList<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
@@ -93,7 +112,6 @@ public class ChessPiece {
 
         return moves;
     }
-
     private Collection<? extends ChessMove> Down(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -116,7 +134,6 @@ public class ChessPiece {
         }
         return moves;
     }
-
     private Collection<? extends ChessMove> Up(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -139,7 +156,6 @@ public class ChessPiece {
         }
         return moves;
     }
-
     private Collection<? extends ChessMove> Left(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -162,7 +178,6 @@ public class ChessPiece {
         }
         return moves;
     }
-
     private Collection<? extends ChessMove> Right(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -198,7 +213,6 @@ public class ChessPiece {
 
         return moves;
     }
-
     private Collection<? extends ChessMove> downLeft(int row, int col, ChessPosition myPosition, ChessBoard board) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int r = row;
