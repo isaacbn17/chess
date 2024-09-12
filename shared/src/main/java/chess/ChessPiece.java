@@ -101,8 +101,18 @@ public class ChessPiece {
         while (row>1) {
             row--;
             ChessPosition newPosition = new ChessPosition(row, col);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition) == null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).getTeamColor() != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
@@ -114,8 +124,18 @@ public class ChessPiece {
         while (row<8) {
             row++;
             ChessPosition newPosition = new ChessPosition(row, col);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition) == null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).getTeamColor() != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
@@ -127,8 +147,18 @@ public class ChessPiece {
         while (col>1) {
             col--;
             ChessPosition newPosition = new ChessPosition(row, col);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition) == null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).getTeamColor() != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
@@ -140,8 +170,18 @@ public class ChessPiece {
         while (col<8) {
             col++;
             ChessPosition newPosition = new ChessPosition(row, col);
-            ChessMove move = new ChessMove(myPosition, newPosition, null);
-            moves.add(move);
+            if (board.getPiece(newPosition) == null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).getTeamColor() != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
         }
         return moves;
     }
