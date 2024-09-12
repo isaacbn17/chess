@@ -76,15 +76,77 @@ public class ChessPiece {
         ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
         switch (type) {
             case BISHOP:
-                possibleMoves = (ArrayList<ChessMove>) bishopMoves(board, myPosition);
+                possibleMoves = bishopMoves(board, myPosition);
                 break;
             case ROOK:
-                //
+                possibleMoves = rookMoves(board, myPosition);
         }
         return possibleMoves;
     }
 
-    private Object bishopMoves(ChessBoard board, ChessPosition myPosition) {
+    private ArrayList<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        moves.addAll(Right(board, myPosition));
+        moves.addAll(Left(board, myPosition));
+        moves.addAll(Up(board, myPosition));
+        moves.addAll(Down(board, myPosition));
+
+        return moves;
+    }
+
+    private Collection<? extends ChessMove> Down(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        while (row>1) {
+            row--;
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+
+    private Collection<? extends ChessMove> Up(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        while (row<8) {
+            row++;
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+
+    private Collection<? extends ChessMove> Left(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        while (col>1) {
+            col--;
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+
+    private Collection<? extends ChessMove> Right(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        while (col<8) {
+            col++;
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+
+    private ArrayList<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
