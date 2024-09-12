@@ -1,5 +1,6 @@
 package chess;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -83,8 +84,41 @@ public class ChessPiece {
                 break;
             case QUEEN:
                 possibleMoves = queenMoves(board, myPosition);
+                break;
+            case PAWN:
+                possibleMoves = pawnMoves(board, myPosition);
         }
         return possibleMoves;
+    }
+
+    private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        moves.add(forward(board, myPosition));
+        return moves;
+    }
+
+    private ChessMove forward(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        ChessPosition newPosition = new ChessPosition(row+1, col);
+        if (board.getPiece(newPosition) == null) {
+            if (color == ChessGame.TeamColor.WHITE) {
+                if (row==8) {
+                    ChessMove move = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                    moves.add(move);
+                }
+                return (new ChessMove(myPosition, newPosition, null));
+            }
+            else if (color == ChessGame.TeamColor.BLACK) {
+                if (row==1) {
+                    ChessMove move = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                    moves.add(move);
+                }
+                return (new ChessMove(myPosition, newPosition, null));
+            }
+        }
+        return null;
     }
 
     private ArrayList<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
