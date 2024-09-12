@@ -20,7 +20,6 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         squares[position.getRow()][position.getColumn()] = piece;
-//        throw new RuntimeException("Not implemented");
     }
     /**
      * Gets a chess piece on the chessboard
@@ -31,7 +30,6 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return squares[position.getRow()][position.getColumn()];
-//        throw new RuntimeException("Not implemented");
     }
 
     /**

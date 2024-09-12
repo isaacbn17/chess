@@ -10,14 +10,19 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
-    // Look at this
     @Override
     public String toString() {
-        return "ChessPiece{}";
+        return "ChessPiece{" +
+                "piece=" + type +
+                '}';
     }
 
+    private final ChessPiece.PieceType type;
+    private final ChessGame.TeamColor color;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.type = type;
+        this.color = pieceColor;
     }
 
     /**
@@ -36,14 +41,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -54,7 +59,97 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<ChessMove>();
+        ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        switch (type) {
+            case BISHOP:
+                possibleMoves = (ArrayList<ChessMove>) bishopMoves(board, myPosition);
+        }
+        return possibleMoves;
+    }
 
+    private Object bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        moves.addAll(upRight(row, col, myPosition));
+        moves.addAll(upLeft(row, col, myPosition));
+        moves.addAll(downRight(row, col, myPosition));
+        moves.addAll(downLeft(row, col, myPosition));
+
+        return moves;
+    }
+
+    private Collection<? extends ChessMove> downLeft(int row, int col, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int r = row;
+        int c = col;
+        while (r>1 && c>1) {
+            r--;
+            c--;
+            ChessPosition newPosition = new ChessPosition(r,c);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+    private Collection<? extends ChessMove> downRight(int row, int col, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int r = row;
+        int c = col;
+        while (r>1 && c<8) {
+            r--;
+            c++;
+            ChessPosition newPosition = new ChessPosition(r,c);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+    private Collection<? extends ChessMove> upLeft(int row, int col, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int r = row;
+        int c = col;
+        while (r<8 && c>1) {
+            r++;
+            c--;
+            ChessPosition newPosition = new ChessPosition(r,c);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+    private ArrayList<ChessMove> upRight(int row, int col, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int r = row;
+        int c = col;
+        while (r<8 && c<8) {
+            r++;
+            c++;
+            ChessPosition newPosition = new ChessPosition(r,c);
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            moves.add(move);
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        for (int i = row-1; i != row+1; i++) {
+            for (int j = col-1; j != col+1; j++) {
+                ChessPosition potentialPosition = new ChessPosition(i,j);
+                if (board.getPiece(potentialPosition) == null) {
+                    //
+                }
+            }
+        }
+        /**
+         * 1. Get the row and column number
+         * 2. Find moves
+         * 3. Is there a piece there of the opposite color?
+         * 4. Is the move on the board?
+         */
+        return new ArrayList<ChessMove>();
     }
 }
