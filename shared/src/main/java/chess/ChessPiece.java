@@ -15,9 +15,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class ChessPiece {
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "piece=" + type +
-                '}';
+        return "" + type;
     }
 
     @Override
@@ -30,7 +28,7 @@ public class ChessPiece {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, color);
+        return 17*Objects.hash(type, color);
     }
 
     private final ChessPiece.PieceType type;
