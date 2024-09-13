@@ -124,18 +124,6 @@ public class ChessPiece {
 
         return moves;
     }
-
-//    private ArrayList<ChessMove> kingLeft(ChessBoard board, ChessPosition myPosition) {
-//        ArrayList<ChessMove> moves = new ArrayList<>();
-//        int row = myPosition.getRow();
-//        int col = myPosition.getColumn();
-//        ChessPosition left = new ChessPosition(row, col-1);
-//        if (board.getPiece(left) == null || board.getPiece(left).getTeamColor() != color) {
-//            moves.add(new ChessMove(myPosition, left, null));
-//        }
-//        return moves;
-//    }
-
     private ArrayList<ChessMove> kingBackward(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -158,7 +146,6 @@ public class ChessPiece {
         }
         return moves;
     }
-
     private ArrayList<ChessMove> kingForward(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
