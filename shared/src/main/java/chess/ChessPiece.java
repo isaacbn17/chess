@@ -95,16 +95,10 @@ public class ChessPiece {
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         if (color == ChessGame.TeamColor.WHITE) {
-            ArrayList<ChessMove> possibleMoves = whitePawn(board, myPosition);
-            if (possibleMoves != null) {
-                moves.addAll(possibleMoves);
-            }
+            moves.addAll(whitePawn(board, myPosition));
         }
         else {
-            ArrayList<ChessMove> possibleMoves = blackPawn(board, myPosition);
-            if (possibleMoves != null) {
-                moves.addAll(possibleMoves);
-            }
+            moves.addAll(blackPawn(board, myPosition));
         }
         return moves;
     }
@@ -122,9 +116,6 @@ public class ChessPiece {
         }
         if (col < 8) {
             ChessPosition captureRight=new ChessPosition(row-1, col+1);
-            if (board.getPiece(captureRight) != null) {
-                System.out.println("There's a piece there!");
-            }
             if (board.getPiece(captureRight) != null && board.getPiece(captureRight).getTeamColor() != color) {
                 if (row-1 == 1) {
                     moves.addAll(promotionPieces(myPosition, captureRight));
@@ -155,7 +146,7 @@ public class ChessPiece {
             moves.add(new ChessMove(myPosition, newPosition, null));
             return moves;
         }
-        return null;
+        return moves;
     }
     private ArrayList<ChessMove> captureWhite(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
@@ -204,7 +195,7 @@ public class ChessPiece {
             moves.add(new ChessMove(myPosition, newPosition, null));
             return moves;
         }
-        return null;
+        return moves;
     }
     private ArrayList<ChessMove> promotionPieces(ChessPosition myPosition, ChessPosition newPosition) {
         ArrayList<ChessMove> pieces = new ArrayList<>();
