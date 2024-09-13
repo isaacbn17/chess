@@ -91,8 +91,95 @@ public class ChessPiece {
                 break;
             case KNIGHT:
                 possibleMoves = knightMoves(board, myPosition);
+                break;
+            case KING:
+                possibleMoves = kingMoves(board, myPosition);
         }
         return possibleMoves;
+    }
+
+    private ArrayList<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (row<8) {
+            moves.addAll(kingForward(board, myPosition));
+        }
+        if (row>1) {
+            moves.addAll(kingBackward(board, myPosition));
+        }
+        if (col>1) {
+            ChessPosition left = new ChessPosition(row, col-1);
+            if (board.getPiece(left) == null || board.getPiece(left).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, left, null));
+            }
+//            moves.addAll(kingLeft(board, myPosition));
+        }
+        if (col<8) {
+            ChessPosition right = new ChessPosition(row, col+1);
+            if (board.getPiece(right) == null || board.getPiece(right).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, right, null));
+            }
+        }
+
+        return moves;
+    }
+
+//    private ArrayList<ChessMove> kingLeft(ChessBoard board, ChessPosition myPosition) {
+//        ArrayList<ChessMove> moves = new ArrayList<>();
+//        int row = myPosition.getRow();
+//        int col = myPosition.getColumn();
+//        ChessPosition left = new ChessPosition(row, col-1);
+//        if (board.getPiece(left) == null || board.getPiece(left).getTeamColor() != color) {
+//            moves.add(new ChessMove(myPosition, left, null));
+//        }
+//        return moves;
+//    }
+
+    private ArrayList<ChessMove> kingBackward(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (col>1) {
+            ChessPosition downLeft = new ChessPosition(row-1, col-1);
+            if (board.getPiece(downLeft) == null || board.getPiece(downLeft).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, downLeft, null));
+            }
+        }
+        ChessPosition up = new ChessPosition(row-1, col);
+        if (board.getPiece(up) == null || board.getPiece(up).getTeamColor() != color) {
+            moves.add(new ChessMove(myPosition, up, null));
+        }
+        if (col<8) {
+            ChessPosition downRight = new ChessPosition(row-1, col+1);
+            if (board.getPiece(downRight) == null || board.getPiece(downRight).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, downRight, null));
+            }
+        }
+        return moves;
+    }
+
+    private ArrayList<ChessMove> kingForward(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (col>1) {
+            ChessPosition upLeft = new ChessPosition(row+1, col-1);
+            if (board.getPiece(upLeft) == null || board.getPiece(upLeft).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, upLeft, null));
+            }
+        }
+        ChessPosition up = new ChessPosition(row+1, col);
+        if (board.getPiece(up) == null || board.getPiece(up).getTeamColor() != color) {
+            moves.add(new ChessMove(myPosition, up, null));
+        }
+        if (col<8) {
+            ChessPosition upRight = new ChessPosition(row+1, col+1);
+            if (board.getPiece(upRight) == null || board.getPiece(upRight).getTeamColor() != color) {
+                moves.add(new ChessMove(myPosition, upRight, null));
+            }
+        }
+        return moves;
     }
 
     private ArrayList<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
@@ -129,11 +216,8 @@ public class ChessPiece {
         if (backwardRight != null) {
             moves.add(backwardRight);
         }
-
-
         return moves;
     }
-
     private ChessMove backwardRight(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -145,7 +229,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove backwardLeft(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -157,7 +240,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove rightBackward(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -169,7 +251,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove leftBackward(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -181,7 +262,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove rightForward(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -193,7 +273,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove leftForward(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -205,7 +284,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove forwardRight(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -217,7 +295,6 @@ public class ChessPiece {
         }
         return null;
     }
-
     private ChessMove forwardLeft(ChessBoard board, ChessPosition myPosition) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -563,25 +640,5 @@ public class ChessPiece {
             }
         }
         return moves;
-    }
-
-    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        for (int i = row-1; i != row+1; i++) {
-            for (int j = col-1; j != col+1; j++) {
-                ChessPosition potentialPosition = new ChessPosition(i,j);
-                if (board.getPiece(potentialPosition) == null) {
-                    //
-                }
-            }
-        }
-        /**
-         * 1. Get the row and column number
-         * 2. Find moves
-         * 3. Is there a piece there of the opposite color?
-         * 4. Is the move on the board?
-         */
-        return new ArrayList<ChessMove>();
     }
 }
