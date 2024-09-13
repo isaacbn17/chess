@@ -88,8 +88,98 @@ public class ChessPiece {
                 break;
             case PAWN:
                 possibleMoves = pawnMoves(board, myPosition);
+                break;
+            case KNIGHT:
+                possibleMoves = knightMoves(board, myPosition);
         }
         return possibleMoves;
+    }
+
+    private ArrayList<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ChessMove forwardLeft = forwardLeft(board, myPosition);
+        if (forwardLeft != null) {
+            moves.add(forwardLeft);
+        }
+        ChessMove forwardRight = forwardRight(board, myPosition);
+        if (forwardRight != null) {
+            moves.add(forwardRight);
+        }
+        ChessMove leftForward = leftForward(board, myPosition);
+        if (leftForward != null) {
+            moves.add(leftForward);
+        }
+        ChessMove rightForward = rightForward(board, myPosition);
+        if (rightForward != null) {
+            moves.add(rightForward);
+        }
+//        ChessMove leftBackward = leftBackward(board, myPosition);
+//        if (leftBackward != null) {
+//            moves.add(leftBackward);
+//        }
+//        ChessMove rightBackward = rightBackward(board, myPosition);
+//        if (rightBackward != null) {
+//            moves.add(rightBackward);
+//        }
+//        ChessMove backwardLeft = backwardLeft(board, myPosition);
+//        if (backwardLeft != null) {
+//            moves.add(backwardLeft);
+//        }
+//        ChessMove backwardRight = backwardRight(board, myPosition);
+//        if (backwardRight != null) {
+//            moves.add(backwardRight);
+//        }
+
+
+        return moves;
+    }
+
+    private ChessMove rightForward(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (row<8 && col<7) {
+            ChessPosition newPosition = new ChessPosition(row+1, col+2);
+            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
+                return new ChessMove(myPosition, newPosition, null);
+            }
+        }
+        return null;
+    }
+
+    private ChessMove leftForward(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (row<8 && col>2) {
+            ChessPosition newPosition = new ChessPosition(row+1, col-2);
+            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
+                return new ChessMove(myPosition, newPosition, null);
+            }
+        }
+        return null;
+    }
+
+    private ChessMove forwardRight(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (row<7 && col<7) {
+            ChessPosition newPosition = new ChessPosition(row+2, col+1);
+            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
+                return new ChessMove(myPosition, newPosition, null);
+            }
+        }
+        return null;
+    }
+
+    private ChessMove forwardLeft(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        if (row<7 && col>1) {
+            ChessPosition newPosition = new ChessPosition(row+2, col-1);
+            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
+                return new ChessMove(myPosition, newPosition, null);
+            }
+        }
+        return null;
     }
 
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
