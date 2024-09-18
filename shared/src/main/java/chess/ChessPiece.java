@@ -17,7 +17,6 @@ public class ChessPiece {
     public String toString() {
         return "" + type;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -25,7 +24,6 @@ public class ChessPiece {
         ChessPiece that = (ChessPiece) o;
         return type == that.type && color == that.color;
     }
-
     @Override
     public int hashCode() {
         return 17*Objects.hash(type, color);
