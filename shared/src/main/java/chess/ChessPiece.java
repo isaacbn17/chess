@@ -7,18 +7,15 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class ChessPiece {
-    @Override
     public String toString() {
         return "" + type;
     }
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
         return type == that.type && color == that.color;
     }
-    @Override
     public int hashCode() {
         return 17*Objects.hash(type, color);
     }
