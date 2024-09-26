@@ -29,7 +29,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> potentialMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+        ChessPiece piece = board.getPiece(startPosition);
+        ChessGame.TeamColor color = piece.getTeamColor();
+        Collection<ChessMove> potentialMoves = piece.pieceMoves(board, startPosition);
+        for (ChessMove move : potentialMoves) {
+
+            // If the move causes the king to be in check, remove it.
+        }
 
         return potentialMoves;
     }
@@ -41,11 +47,17 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPosition start = move.getStartPosition();
-        ChessPosition end = move.getEndPosition();
-        ChessPiece piece = board.getPiece(start);
-        board.addPiece(end, piece);
-        board.removePiece(start, piece);
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        if (validMoves.contains(move)) {
+            ChessPosition start = move.getStartPosition();
+            ChessPosition end = move.getEndPosition();
+            ChessPiece piece = board.getPiece(start);
+            board.addPiece(end, piece);
+            board.removePiece(start, piece);
+        }
+        else {
+            throw new InvalidMoveException("Invalid move");
+        }
     }
 
     /**
