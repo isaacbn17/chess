@@ -41,7 +41,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece piece = board.getPiece(start);
+        board.addPiece(end, piece);
+        board.removePiece(start, piece);
     }
 
     /**
@@ -66,15 +70,14 @@ public class ChessGame {
         for (int i=1; i<9; i++) {
             for (int j=1; j<9; j++) {
                 if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != teamColor) {
-                    ChessPosition position = new ChessPosition(i, j);
                     ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+                    ChessPosition position = new ChessPosition(i, j);
                     moves.addAll(piece.pieceMoves(board, position));
                 }
             }
         }
         return moves;
     }
-
     private ChessPosition findKing(TeamColor teamColor) {
         for (int i=1; i<9; i++) {
             for (int j=1; j<9; j++) {
@@ -104,7 +107,16 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKing(teamColor);
+        ChessPiece king = board.getPiece(kingPosition);
+        Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPosition);
+        ArrayList<ChessMove> opposingMoves = getOpposingTeamMoves(teamColor);
+        for (ChessMove kingMove : kingMoves) {
+            if (! opposingMoves.contains(kingMove)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void setBoard(ChessBoard board) {
