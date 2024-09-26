@@ -125,7 +125,7 @@ public class ChessPiece {
             }
         }
         if (col < 8) {
-            ChessPosition captureRight=new ChessPosition(row+1, col + 1);
+            ChessPosition captureRight=new ChessPosition(row+1, col+1);
             if (board.getPiece(captureRight) != null && board.getPiece(captureRight).getTeamColor() != color) {
                 if (row+1 == 8) {
                     moves.addAll(promotionPieces(myPosition, captureRight));
@@ -137,7 +137,7 @@ public class ChessPiece {
         return moves;
     }
     private ArrayList<ChessMove> whitePawn(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves=new ArrayList<>(captureWhite(board, myPosition));
+        ArrayList<ChessMove> moves = new ArrayList<>(captureWhite(board, myPosition));
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         ChessPosition newPosition = new ChessPosition(row+1, col);
