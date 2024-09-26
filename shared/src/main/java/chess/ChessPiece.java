@@ -130,7 +130,29 @@ public class ChessPiece {
             }
         }
     }
+    private void severalMoves(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> moves) {
+        int row = myPosition.getRow();
+        int col =myPosition.getColumn();
+        while ((0 < row+x && row+x < 9) && (0 < col+y && col+y < 9)) {
+            row += x;
+            col += y;
+            ChessPosition newPosition = new ChessPosition(row, col);
+            if (board.getPiece(newPosition)==null) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+            }
+            else if (board.getPiece(newPosition).color != color) {
+                ChessMove move = new ChessMove(myPosition, newPosition, null);
+                moves.add(move);
+                break;
+            }
+            else {
+                break;
+            }
+        }
 
+
+    }
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         if (color == ChessGame.TeamColor.WHITE) {
@@ -360,15 +382,11 @@ public class ChessPiece {
     }
 
     private ArrayList<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-
-        moves.addAll(upRight(row, col, myPosition, board));
-        moves.addAll(upLeft(row, col, myPosition, board));
-        moves.addAll(downRight(row, col, myPosition, board));
-        moves.addAll(downLeft(row, col, myPosition, board));
-
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        severalMoves(board, myPosition, -1, -1, moves);
+        severalMoves(board, myPosition, -1, 1, moves);
+        severalMoves(board, myPosition, 1, -1, moves);
+        severalMoves(board, myPosition, 1, 1, moves);
         return moves;
     }
     private Collection<? extends ChessMove> downLeft(int row, int col, ChessPosition myPosition, ChessBoard board) {
