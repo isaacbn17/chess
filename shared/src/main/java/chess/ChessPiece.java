@@ -167,127 +167,27 @@ public class ChessPiece {
 
     private ArrayList<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        ChessMove forwardLeft = forwardLeft(board, myPosition);
-        if (forwardLeft != null) {
-            moves.add(forwardLeft);
-        }
-        ChessMove forwardRight = forwardRight(board, myPosition);
-        if (forwardRight != null) {
-            moves.add(forwardRight);
-        }
-        ChessMove leftForward = leftForward(board, myPosition);
-        if (leftForward != null) {
-            moves.add(leftForward);
-        }
-        ChessMove rightForward = rightForward(board, myPosition);
-        if (rightForward != null) {
-            moves.add(rightForward);
-        }
-        ChessMove leftBackward = leftBackward(board, myPosition);
-        if (leftBackward != null) {
-            moves.add(leftBackward);
-        }
-        ChessMove rightBackward = rightBackward(board, myPosition);
-        if (rightBackward != null) {
-            moves.add(rightBackward);
-        }
-        ChessMove backwardLeft = backwardLeft(board, myPosition);
-        if (backwardLeft != null) {
-            moves.add(backwardLeft);
-        }
-        ChessMove backwardRight = backwardRight(board, myPosition);
-        if (backwardRight != null) {
-            moves.add(backwardRight);
-        }
+        knightMove(board, myPosition, 1, 2, moves);
+        knightMove(board, myPosition, 1, -2, moves);
+        knightMove(board, myPosition, 2, 1, moves);
+        knightMove(board, myPosition, 2, -1, moves);
+        knightMove(board, myPosition, -1, 2, moves);
+        knightMove(board, myPosition, -1, -2, moves);
+        knightMove(board, myPosition, -2, 1, moves);
+        knightMove(board, myPosition, -2, -1, moves);
+
         return moves;
     }
-    private ChessMove backwardRight(ChessBoard board, ChessPosition myPosition) {
+
+    private void knightMove(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> move) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        if (row>2 && col<8) {
-            ChessPosition newPosition = new ChessPosition(row-2, col+1);
+        if ((0 < row+x && row+x < 9) && (0 < col+y && col+y <9)) {
+            ChessPosition newPosition = new ChessPosition(row+x, col+y);
             if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
+                move.add(new ChessMove(myPosition, newPosition, null));
             }
         }
-        return null;
-    }
-    private ChessMove backwardLeft(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row>2 && col>1) {
-            ChessPosition newPosition = new ChessPosition(row-2, col-1);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove rightBackward(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row>1 && col<7) {
-            ChessPosition newPosition = new ChessPosition(row-1, col+2);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove leftBackward(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row>1 && col>2) {
-            ChessPosition newPosition = new ChessPosition(row-1, col-2);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove rightForward(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row<8 && col<7) {
-            ChessPosition newPosition = new ChessPosition(row+1, col+2);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove leftForward(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row<8 && col>2) {
-            ChessPosition newPosition = new ChessPosition(row+1, col-2);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove forwardRight(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row<7 && col<7) {
-            ChessPosition newPosition = new ChessPosition(row+2, col+1);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
-    }
-    private ChessMove forwardLeft(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        if (row<7 && col>1) {
-            ChessPosition newPosition = new ChessPosition(row+2, col-1);
-            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                return new ChessMove(myPosition, newPosition, null);
-            }
-        }
-        return null;
     }
 
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
