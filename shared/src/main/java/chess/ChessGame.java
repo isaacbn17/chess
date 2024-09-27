@@ -80,14 +80,25 @@ import java.util.Set;
                     ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
                     board.addPiece(move.getEndPosition(), promotionPiece);
                     board.removePiece(move.getStartPosition(), piece);
+                    setTeamTurn(getOppositeColor(color));
                 }
                 else {
                     board.addPiece(move.getEndPosition(), piece);
                     board.removePiece(move.getStartPosition(), piece);
+                    setTeamTurn(getOppositeColor(color));
                 }
             }
             else {
                 throw new InvalidMoveException("Invalid move");
+            }
+        }
+
+        private TeamColor getOppositeColor(TeamColor color) {
+            if (color == TeamColor.BLACK) {
+                return TeamColor.WHITE;
+            }
+            else {
+                return TeamColor.BLACK;
             }
         }
 
