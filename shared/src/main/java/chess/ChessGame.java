@@ -32,19 +32,23 @@ import java.util.Set;
          */
         public Collection<ChessMove> validMoves(ChessPosition startPosition) {
             ChessPiece piece = board.getPiece(startPosition);
-            ChessGame.TeamColor color = piece.getTeamColor();
+            TeamColor color = piece.getTeamColor();
 
             Collection<ChessMove> potentialMoves = piece.pieceMoves(board, startPosition);
+            HashSet<ChessMove> validMoves = new HashSet<>();
             for (ChessMove move : potentialMoves) {
 
                 pretendToMakeMove(move);
                 if (isInCheck(color)) {
                     reversePretendedMove(move);
-                    potentialMoves.remove(move);
+                }
+                else {
+                    reversePretendedMove(move);
+                    validMoves.add(move);
                 }
             }
 
-            return potentialMoves;
+            return validMoves;
         }
 
         private void reversePretendedMove(ChessMove move) {
@@ -65,11 +69,22 @@ import java.util.Set;
                 throw new InvalidMoveException("Invalid move");
             }
             Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-            ChessGame.TeamColor color = board.getPiece(move.getStartPosition()).getTeamColor();
+            if (validMoves == null) {
+                throw new InvalidMoveException("Invalid move");
+            }
+
+            TeamColor color = board.getPiece(move.getStartPosition()).getTeamColor();
             if (getTeamTurn() == color && validMoves.contains(move)) {
                 ChessPiece piece = board.getPiece(move.getStartPosition());
-                board.addPiece(move.getEndPosition(), piece);
-                board.removePiece(move.getStartPosition(), piece);
+                if (move.getPromotionPiece() != null) {
+                    ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
+                    board.addPiece(move.getEndPosition(), promotionPiece);
+                    board.removePiece(move.getStartPosition(), piece);
+                }
+                else {
+                    board.addPiece(move.getEndPosition(), piece);
+                    board.removePiece(move.getStartPosition(), piece);
+                }
             }
             else {
                 throw new InvalidMoveException("Invalid move");
@@ -80,8 +95,7 @@ import java.util.Set;
             ChessPosition kingPosition = findKing(teamColor);
             HashSet<ChessMove> moves = getOpposingTeamMoves(teamColor);
             for (ChessMove move : moves) {
-                System.out.print(move.getEndPosition());
-                if (move.getEndPosition() == kingPosition) {
+                if (move.getEndPosition().equals(kingPosition)) {
                     return true;
                 }
             }
