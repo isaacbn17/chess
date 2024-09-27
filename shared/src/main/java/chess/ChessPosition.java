@@ -7,6 +7,10 @@ public class ChessPosition {
   public String toString() {
     return row + "" + col;
   }
+
+  private final int row;
+  private final int col;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -14,13 +18,11 @@ public class ChessPosition {
     ChessPosition that=(ChessPosition) o;
     return row == that.row && col == that.col;
   }
+
   @Override
   public int hashCode() {
     return Objects.hash(row, col);
   }
-
-  private final int row;
-  private final int col;
 
   public ChessPosition(int row, int col) {
     this.row=row;
