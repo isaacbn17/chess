@@ -246,6 +246,7 @@ import java.util.HashSet;
          */
         public boolean isInStalemate(TeamColor teamColor) {
             ChessPosition kingPosition = findKing(teamColor);
+            if (kingPosition == null) { return false; }
             ChessPiece king = board.getPiece(kingPosition);
             Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPosition);
 
