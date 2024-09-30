@@ -216,10 +216,11 @@ import java.util.HashSet;
             if (isInCheck(teamColor)) {
                 HashSet<ChessPosition> teamPositions = getTeamPositions(teamColor);
                 for (ChessPosition position : teamPositions) {
-                    if (validMoves(position).isEmpty()) {
-                        return true;
+                    if (! validMoves(position).isEmpty()) {
+                        return false;
                     }
                 }
+                return true;
             }
             return false;
         }
