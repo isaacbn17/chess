@@ -157,12 +157,27 @@ import java.util.HashSet;
                 for (int j=1; j<9; j++) {
                     ChessPiece piece = board.getPiece(new ChessPosition(i, j));
                     if (piece != null && piece.getTeamColor() != teamColor) {
-                        moves.addAll(piece.pieceMoves(board, new ChessPosition(i, j)));
+                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                            addPawnAttackMoves(i, j, piece, moves);
+                        }
+                        else {
+                            moves.addAll(piece.pieceMoves(board, new ChessPosition(i, j)));
+                        }
                     }
                 }
             }
             return moves;
         }
+
+        private void addPawnAttackMoves(int row, int col, ChessPiece piece, HashSet<ChessMove> moves) {
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                moves.addAll(piece.captureWhite(board, new ChessPosition(row, col)));
+            }
+            else {
+                moves.addAll(piece.captureBlack(board, new ChessPosition(row, col)));
+            }
+        }
+
         private ChessPosition findKing(TeamColor teamColor) {
 //          if (teamColor == TeamColor.WHITE) {
 //            for (ChessPosition position : board.getWhitePositions()) {

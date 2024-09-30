@@ -60,8 +60,10 @@ public class ChessPiece {
             case BLACK -> blackPawn(board, myPosition);
         };
     }
-    private ArrayList<ChessMove> captureBlack(int row, int col, ChessBoard board, ChessPosition myPosition) {
+    public ArrayList<ChessMove> captureBlack(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
         if (col > 1) {
             ChessPosition captureLeft = new ChessPosition(row-1, col-1);
             if (board.getPiece(captureLeft) != null && board.getPiece(captureLeft).getTeamColor() != color) {
@@ -85,9 +87,9 @@ public class ChessPiece {
         return moves;
     }
     private ArrayList<ChessMove> blackPawn(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> moves=new ArrayList<>(captureBlack(board, myPosition));
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        ArrayList<ChessMove> moves=new ArrayList<>(captureBlack(row, col, board, myPosition));
         ChessPosition newPosition = new ChessPosition(row-1, col);
         if (board.getPiece(newPosition) == null) {
             if (row==7) {
@@ -106,7 +108,7 @@ public class ChessPiece {
         }
         return moves;
     }
-    private ArrayList<ChessMove> captureWhite(ChessBoard board, ChessPosition myPosition) {
+    public ArrayList<ChessMove> captureWhite(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
