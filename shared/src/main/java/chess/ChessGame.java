@@ -8,6 +8,7 @@ import java.util.HashSet;
         private TeamColor teamTurn = TeamColor.WHITE;
         private ChessBoard board = new ChessBoard();
         public ChessGame() {
+            board.resetBoard();
         }
 
         public TeamColor getTeamTurn() {
@@ -247,6 +248,14 @@ import java.util.HashSet;
         public boolean isInStalemate(TeamColor teamColor) {
             ChessPosition kingPosition = findKing(teamColor);
             if (kingPosition == null) { return false; }
+            for (ChessPosition position : getTeamPositions(teamColor)) {
+                ChessPiece piece = board.getPiece(position);
+                if (piece.getPieceType() != ChessPiece.PieceType.KING) {
+                    if (! piece.pieceMoves(board, position).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
             ChessPiece king = board.getPiece(kingPosition);
             Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPosition);
 
