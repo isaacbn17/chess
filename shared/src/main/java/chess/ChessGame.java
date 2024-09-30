@@ -31,13 +31,6 @@ import java.util.HashSet;
             BLACK
         }
 
-        /**
-         * Gets a valid moves for a piece at the given location
-         *
-         * @param startPosition the piece to get valid moves for
-         * @return Set of valid moves for requested piece, or null if no piece at
-         * startPosition
-         */
         public Collection<ChessMove> validMoves(ChessPosition startPosition) {
             ChessPiece piece = board.getPiece(startPosition);
             TeamColor color = piece.getTeamColor();
@@ -61,7 +54,7 @@ import java.util.HashSet;
         private void reversePretendedMove(ChessMove move, ChessPiece disappearingPiece) {
             ChessPiece piece = board.getPiece(move.getEndPosition());
             board.addPiece(move.getStartPosition(), piece);
-            board.removePiece(move.getEndPosition(), piece);
+            board.removePiece(move.getEndPosition());
             if (disappearingPiece != null) {
                 board.addPiece(move.getEndPosition(), disappearingPiece);
             }
@@ -70,13 +63,13 @@ import java.util.HashSet;
             ChessPiece piece = board.getPiece(move.getStartPosition());
             if (board.getPiece(move.getEndPosition()) == null) {
                 board.addPiece(move.getEndPosition(), piece);
-                board.removePiece(move.getStartPosition(), piece);
+                board.removePiece(move.getStartPosition());
                 return null;
             }
             else {
                 ChessPiece disappearingPiece = board.getPiece(move.getEndPosition());
                 board.addPiece(move.getEndPosition(), piece);
-                board.removePiece(move.getStartPosition(), piece);
+                board.removePiece(move.getStartPosition());
                 return disappearingPiece;
             }
         }
@@ -97,30 +90,17 @@ import java.util.HashSet;
                 if (move.getPromotionPiece() != null) {
                     ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
                     board.addPiece(move.getEndPosition(), promotionPiece);
-                    board.removePiece(move.getStartPosition(), piece);
+                    board.removePiece(move.getStartPosition());
                     setTeamTurn(getOppositeColor(color));
-//                    adjustPiecePosition(color, move);
                 }
                 else {
                     board.addPiece(move.getEndPosition(), piece);
-                    board.removePiece(move.getStartPosition(), piece);
+                    board.removePiece(move.getStartPosition());
                     setTeamTurn(getOppositeColor(color));
-//                    adjustPiecePosition(color, move);
                 }
             }
             else {
                 throw new InvalidMoveException("Invalid move");
-            }
-        }
-
-        private void adjustPiecePosition(TeamColor color, ChessMove move) {
-            if (color == TeamColor.WHITE) {
-                board.getWhitePositions().add(move.getEndPosition());
-                board.getWhitePositions().remove(move.getStartPosition());
-            }
-            else {
-                board.getBlackPositions().add(move.getEndPosition());
-                board.getBlackPositions().remove(move.getStartPosition());
             }
         }
 
@@ -206,12 +186,6 @@ import java.util.HashSet;
             return null;
         }
 
-        /**
-         * Determines if the given team is in checkmate
-         *
-         * @param teamColor which team to check for checkmate
-         * @return True if the specified team is in checkmate
-         */
         public boolean isInCheckmate(TeamColor teamColor) {
             if (isInCheck(teamColor)) {
                 HashSet<ChessPosition> teamPositions = getTeamPositions(teamColor);
@@ -238,13 +212,6 @@ import java.util.HashSet;
             return teamPositions;
         }
 
-        /**
-         * Determines if the given team is in stalemate, which here is defined as having
-         * no valid moves
-         *
-         * @param teamColor which team to check for stalemate
-         * @return True if the specified team is in stalemate, otherwise false
-         */
         public boolean isInStalemate(TeamColor teamColor) {
             ChessPosition kingPosition = findKing(teamColor);
             if (kingPosition == null) { return false; }

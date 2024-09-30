@@ -3,29 +3,9 @@ package chess;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/**
- * A chessboard that can hold and rearrange chess pieces.
- * <p>
- * Note: You can add to this class, but you may not alter
- * signature of the existing methods.
- */
 public class ChessBoard {
 
     private final ChessPiece[][] squares = new ChessPiece[8][8];
-    private HashSet<ChessPosition> whitePositions = new HashSet<>() {{
-        for (int r=1; r<3; r++) {
-            for (int c=1; c<9; c++) {
-                add(new ChessPosition(r, c));
-            }
-        }
-    }};
-    private HashSet<ChessPosition> blackPositions = new HashSet<>() {{
-        for (int r=7; r<9; r++) {
-            for (int c=1; c<9; c++) {
-                add(new ChessPosition(r, c));
-            }
-        }
-    }};
     public ChessBoard() {
     }
 
@@ -45,19 +25,13 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
-    public void removePiece(ChessPosition position, ChessPiece piece) {
+    public void removePiece(ChessPosition position) {
         squares[position.getRow()-1][position.getColumn()-1] = null;
     }
     public ChessPiece getPiece(ChessPosition position) {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
-    public HashSet<ChessPosition> getWhitePositions() {
-        return whitePositions;
-    }
-    public HashSet<ChessPosition> getBlackPositions() {
-        return blackPositions;
-    }
 
     public void resetBoard() {
         addPawns();
