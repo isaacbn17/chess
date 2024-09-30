@@ -168,7 +168,6 @@ import java.util.HashSet;
             }
             return moves;
         }
-
         private void addPawnAttackMoves(int row, int col, ChessPiece piece, HashSet<ChessMove> moves) {
             if (piece.getTeamColor() == TeamColor.WHITE) {
                 moves.addAll(piece.captureWhite(board, new ChessPosition(row, col)));
@@ -198,8 +197,8 @@ import java.util.HashSet;
             for (int i=1; i<9; i++) {
                 for (int j=1; j<9; j++) {
                     ChessPiece piece = board.getPiece(new ChessPosition(i, j));
-                    if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING &&
-                            board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
+                    if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING
+                            && piece.getTeamColor() == teamColor) {
                         return new ChessPosition(i, j);
                     }
                 }
@@ -213,7 +212,29 @@ import java.util.HashSet;
          * @param teamColor which team to check for checkmate
          * @return True if the specified team is in checkmate
          */
-        public boolean isInCheckmate(TeamColor teamColor) { throw new RuntimeException("Not implemented");
+        public boolean isInCheckmate(TeamColor teamColor) {
+            if (isInCheck(teamColor)) {
+                HashSet<ChessPosition> teamPositions = getTeamPositions(teamColor);
+                for (ChessPosition position : teamPositions) {
+                    if (validMoves(position).isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private HashSet<ChessPosition> getTeamPositions(TeamColor teamColor) {
+            HashSet<ChessPosition> teamPositions = new HashSet<>();
+            for (int i=1; i<9; i++) {
+                for (int j=1; j<9; j++) {
+                    ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+                    if (piece != null && piece.getTeamColor() == teamColor) {
+                        teamPositions.add(new ChessPosition(i, j));
+                    }
+                }
+            }
+            return teamPositions;
         }
 
         /**
@@ -227,6 +248,7 @@ import java.util.HashSet;
             ChessPosition kingPosition = findKing(teamColor);
             ChessPiece king = board.getPiece(kingPosition);
             Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPosition);
+
             HashSet<ChessMove> opposingMoves = getOpposingTeamMoves(teamColor);
             for (ChessMove kingMove : kingMoves) {
                 if (! opposingMoves.contains(kingMove)) {
