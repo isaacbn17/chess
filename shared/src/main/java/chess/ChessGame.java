@@ -136,36 +136,35 @@ import java.util.HashSet;
 
         private HashSet<ChessMove> getOpposingTeamMoves(TeamColor teamColor) {
             HashSet<ChessMove> moves = new HashSet<>();
-//            if (teamColor == TeamColor.BLACK) {
-//                for (ChessPosition position : board.getWhitePositions()) {
-//                    ChessPiece piece = board.getPiece(position);
-//                    if (piece != null) {
-//                        moves.addAll(piece.pieceMoves(board, position));
-//                    }
-//                }
-//            }
-//            else {
-//                for (ChessPosition position : board.getBlackPositions()) {
-//                    ChessPiece piece = board.getPiece(position);
-//                    if (piece != null) {
-//                        moves.addAll(piece.pieceMoves(board, position));
-//                    }
-//                }
-//            }
-//            return moves;
-            for (int i=1; i<9; i++) {
-                for (int j=1; j<9; j++) {
-                    ChessPiece piece = board.getPiece(new ChessPosition(i, j));
-                    if (piece != null && piece.getTeamColor() != teamColor) {
-                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                            addPawnAttackMoves(i, j, piece, moves);
-                        }
-                        else {
-                            moves.addAll(piece.pieceMoves(board, new ChessPosition(i, j)));
-                        }
-                    }
+            HashSet<ChessPosition> opposingTeamPositions;
+            if (teamColor == TeamColor.BLACK) {
+                opposingTeamPositions = getTeamPositions(TeamColor.WHITE);
+            }
+            else {
+                opposingTeamPositions = getTeamPositions(TeamColor.BLACK);
+            }
+            for (ChessPosition position : opposingTeamPositions) {
+                ChessPiece piece = board.getPiece(position);
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                    addPawnAttackMoves(position.getRow(), position.getColumn(), piece, moves);
+                }
+                else {
+                    moves.addAll(piece.pieceMoves(board, position));
                 }
             }
+//            for (int i=1; i<9; i++) {
+//                for (int j=1; j<9; j++) {
+//                    ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+//                    if (piece != null && piece.getTeamColor() != teamColor) {
+//                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+//                            addPawnAttackMoves(i, j, piece, moves);
+//                        }
+//                        else {
+//                            moves.addAll(piece.pieceMoves(board, new ChessPosition(i, j)));
+//                        }
+//                    }
+//                }
+//            }
             return moves;
         }
         private void addPawnAttackMoves(int row, int col, ChessPiece piece, HashSet<ChessMove> moves) {
@@ -252,8 +251,13 @@ import java.util.HashSet;
             Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPosition);
 
             HashSet<ChessMove> opposingMoves = getOpposingTeamMoves(teamColor);
+            HashSet<ChessPosition> opposingEndMoves = new HashSet<>();
+            for (ChessMove move : opposingMoves) {
+                opposingEndMoves.add(move.getEndPosition());
+            }
             for (ChessMove kingMove : kingMoves) {
-                if (! opposingMoves.contains(kingMove)) {
+                ChessPosition kingDestination = kingMove.getEndPosition();
+                if (! opposingEndMoves.contains(kingDestination)) {
                     return false;
                 }
             }
