@@ -2,6 +2,8 @@ package server;
 
 import dataaccess.DataAccessException;
 import model.UserData;
+import model.GameData;
+import model.AuthData;
 import service.Delete;
 import spark.*;
 
@@ -9,12 +11,14 @@ import java.util.ArrayList;
 
 public class Server {
     ArrayList<UserData> users = new ArrayList<>();
+    ArrayList<GameData> games = new ArrayList<>();
+    ArrayList<AuthData> authTokens = new ArrayList<>();
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::deleteEverything);
@@ -32,7 +36,9 @@ public class Server {
 
     private Object deleteEverything(Request req, Response res) throws DataAccessException {
         Delete delete = new Delete();
-        delete.clearApp(users);
+        delete.clearUsers(users);
+        delete.clearGames(games);
+        delete.clearAuthTokens(authTokens);
         res.status(204);
         return "";
     }

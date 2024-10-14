@@ -6,14 +6,13 @@ import java.util.ArrayList;
 
 public class MemoryUserDAO implements UserDAO {
 
-  ArrayList<UserData> users = new ArrayList<>();
+  @Override
+  public void clear(ArrayList<UserData> users) {
+    users.clear();
+  }
 
   @Override
   public void addUser() {
 
-  }
-  @Override
-  public void clear(ArrayList<UserData> users) {
-    users.clear();
   }
 }
