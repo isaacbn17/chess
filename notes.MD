@@ -91,3 +91,17 @@ public int hashCode() {
 The goal is to nearly uniquely represent each object.
 
 record PetRecord(int id, String name, String type) {}
+
+**JDK Collections**
+
+Package: java.util
+
+Interfaces: List, Map, Set, Iterator
+
+Implementations: ArrayList, HashMap, HashSet
+
+**Exceptions**
+
+"Push up the handling of errors."
+
+try { } catch (FileNotFoundException ex) { // Specific file error handling } catch (Exception ex) { General error handling }
