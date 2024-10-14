@@ -7,7 +7,7 @@ import model.UserData;
 
 import java.util.ArrayList;
 
-public class Service {
+public class Delete {
 
     public void clearApp(ArrayList<UserData> users) throws DataAccessException {
         UserDAO userDAO = new MemoryUserDAO();

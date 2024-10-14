@@ -1,2 +1,4 @@
-package dataaccess;public class SQLGameDAO {
+package dataaccess;
+
+public class SQLGameDAO {
 }

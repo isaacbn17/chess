@@ -1,2 +1,4 @@
-package dataaccess;public interface GameDAO {
+package dataaccess;
+
+public interface GameDAO {
 }

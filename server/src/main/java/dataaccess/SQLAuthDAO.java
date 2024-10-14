@@ -1,2 +1,4 @@
-package dataaccess;public class SQLAuthDAO {
+package dataaccess;
+
+public class SQLAuthDAO {
 }
