@@ -2,12 +2,12 @@ package dataaccess;
 
 import model.GameData;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
 
   @Override
-  public void clear(ArrayList<GameData> games) {
+  public void clear(HashMap<String, GameData> games) {
     games.clear();
   }
 }
