@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -9,7 +8,7 @@ import model.UserData;
 import model.GameData;
 import model.AuthData;
 import service.Delete;
-import service.Register;
+import service.UserService;
 import spark.*;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class Server {
     private MemoryGameDAO gameDAO = new MemoryGameDAO();
     private MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
-    private Register register = new Register(userDAO, authDAO);
+    private UserService userService = new UserService(userDAO, authDAO);
     private Delete delete = new Delete(userDAO, gameDAO, authDAO);
 
     ArrayList<UserData> users = new ArrayList<>();
@@ -37,7 +36,7 @@ public class Server {
         Spark.post("/user", (req, res) -> createUser(req, res));
         Spark.delete("/db", this::deleteEverything);
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+//        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -49,12 +48,8 @@ public class Server {
     }
 
     private String createUser(Request req, Response res) {
-        var user = new Gson();
-        var newUser = user.fromJson(
-                """
-                { "username":"", "password":"", "email":"" }
-                """, UserData.class);
-        newUser = register.registerUser(newUser);
+        UserData newUser = new Gson().fromJson(req.body(), UserData.class);
+        newUser = userService.registerUser(newUser);
         res.status(200);
         return new Gson().toJson(newUser);
 

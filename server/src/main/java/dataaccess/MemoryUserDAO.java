@@ -9,7 +9,6 @@ public class MemoryUserDAO implements UserDAO {
 
   ArrayList<UserData> users = new ArrayList<>();
 
-
   @Override
   public void clear() {
     users.clear();
