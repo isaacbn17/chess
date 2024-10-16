@@ -2,6 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import model.UserData;
 import model.GameData;
 import model.AuthData;
@@ -13,7 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Server {
-    private Register s = new Register();
+    private MemoryUserDAO userDAO = new MemoryUserDAO();
+    private MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
+
+    private Register register = new Register(userDAO, authDAO);
+    private Delete delete = new Delete(userDAO, gameDAO, authDAO);
+
     ArrayList<UserData> users = new ArrayList<>();
     HashMap<String, GameData> games = new HashMap<>();
     ArrayList<AuthData> authTokens = new ArrayList<>();
@@ -45,18 +54,17 @@ public class Server {
                 """
                 { "username":"", "password":"", "email":"" }
                 """, UserData.class);
-        var x = s.registerUser(newUser);
-
-        return user.toJson(user);
+        newUser = register.registerUser(newUser);
+        res.status(200);
+        return new Gson().toJson(newUser);
 
     }
 
     private Object deleteEverything(Request req, Response res) {
-        Delete delete = new Delete();
-        delete.clearUsers(users);
-        delete.clearGames(games);
-        delete.clearAuthTokens(authTokens);
-        res.status(204);
+        delete.clearUsers();
+        delete.clearGames();
+        delete.clearAuthTokens();
+        res.status(200);
         return "";
     }
 }

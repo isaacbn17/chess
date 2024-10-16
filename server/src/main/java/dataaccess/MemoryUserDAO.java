@@ -1,18 +1,23 @@
 package dataaccess;
 
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 
 import java.util.ArrayList;
 
 public class MemoryUserDAO implements UserDAO {
 
+  ArrayList<UserData> users = new ArrayList<>();
+
+
   @Override
-  public void clear(ArrayList<UserData> users) {
+  public void clear() {
     users.clear();
   }
 
   @Override
-  public void addUser() {
-
+  public UserData addUser(UserData newUser) {
+    users.add(newUser);
+    return newUser;
   }
 }

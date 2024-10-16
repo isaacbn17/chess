@@ -4,5 +4,5 @@ import java.util.ArrayList;
 import model.AuthData;
 
 public interface AuthDAO {
-  public void clear(ArrayList<AuthData> authTokens);
+  public void clear();
 }
