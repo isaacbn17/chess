@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
@@ -10,6 +12,7 @@ import service.Delete;
 import service.UserService;
 import spark.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +26,6 @@ public class Server {
     private UserService userService = new UserService(userDAO, authDAO);
     private Delete delete = new Delete(userDAO, gameDAO, authDAO);
 
-    ArrayList<UserData> users = new ArrayList<>();
-    HashMap<String, GameData> games = new HashMap<>();
-    ArrayList<AuthData> authTokens = new ArrayList<>();
-
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -36,14 +35,12 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (req, res) -> createUser(req, res));
         Spark.delete("/db", this::deleteEverything);
-        Spark.exception(DataAccessException.class, this::badRequest);
-        // This line initializes the server and can be removed once you have a functioning endpoint
-//        Spark.init();
+        Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
     }
-    public void badRequest(DataAccessException ex, Request req, Response res) {
+    public void exceptionHandler(Exception ex, Request req, Response res) {
         String message = ex.getMessage();
         if (Objects.equals(message, "Error: bad request")) {
             res.status(400);
@@ -65,14 +62,19 @@ public class Server {
     }
 
     private String createUser(Request req, Response res) throws DataAccessException {
-        UserData newUser = new Gson().fromJson(req.body(), UserData.class);
+        try {
+            UserData newUser = new Gson().fromJson(req.body(), UserData.class);
 
-        RegisterRequest registeredUser = userService.registerUser(newUser);
-        res.status(200);
-        return new Gson().toJson(registeredUser);
+            RegisterRequest registeredUser = userService.registerUser(newUser);
+            res.status(200);
+            return new Gson().toJson(registeredUser);
+        } catch (JsonSyntaxException ex) {
+            exceptionHandler(ex, req, res);
+        }
+        return "";
     }
 
-    private Object deleteEverything(Request req, Response res) {
+    private String deleteEverything(Request req, Response res) {
         delete.clearUsers();
         delete.clearGames();
         delete.clearAuthTokens();

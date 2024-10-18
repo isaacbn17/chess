@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class MemoryAuthDAO implements AuthDAO {
     Map<String, AuthData> authTokens = new HashMap<>();
-//  private ArrayList<AuthData> authTokens = new ArrayList<>();
 
     @Override
     public void clear() {

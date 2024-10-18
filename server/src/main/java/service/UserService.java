@@ -8,6 +8,8 @@ import model.AuthData;
 import model.RegisterRequest;
 import model.UserData;
 
+import java.util.Objects;
+
 public class UserService {
 
     UserDAO userDAO;
@@ -19,7 +21,8 @@ public class UserService {
     }
 
     public RegisterRequest registerUser(UserData newUser) throws DataAccessException {
-        if (newUser.username() == null || newUser.password() == null || newUser.email() == null) {
+        if (newUser.username() == null || newUser.password() == null || newUser.email() == null ||
+                newUser.username().isEmpty() || newUser.password().isEmpty() || newUser.email().isEmpty()) {
             throw new DataAccessException("Error: bad request");
         }
         if (userDAO.getUser(newUser.username()) != null) {
