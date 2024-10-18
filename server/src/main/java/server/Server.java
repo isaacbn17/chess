@@ -5,15 +5,15 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import model.UserData;
-import model.GameData;
-import model.AuthData;
+import model.*;
 import service.Delete;
 import service.UserService;
 import spark.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class Server {
     private MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -36,13 +36,29 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (req, res) -> createUser(req, res));
         Spark.delete("/db", this::deleteEverything);
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        Spark.exception(DataAccessException.class, this::badRequest);
+        // This line initializes the server and can be removed once you have a functioning endpoint
 //        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
     }
+    public void badRequest(DataAccessException ex, Request req, Response res) {
+        String message = ex.getMessage();
+        if (Objects.equals(message, "Error: bad request")) {
+            res.status(400);
+            res.body(new Gson().toJson(new ErrorMessage(message)));
+        }
+        else if (Objects.equals(message, "Error: already taken")) {
+            res.status(403);
+            res.body(new Gson().toJson(new ErrorMessage(message)));
 
+        }
+        else {
+            res.status(500);
+            res.body(new Gson().toJson(new ErrorMessage(message)));
+        }
+    }
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
@@ -50,16 +66,10 @@ public class Server {
 
     private String createUser(Request req, Response res) throws DataAccessException {
         UserData newUser = new Gson().fromJson(req.body(), UserData.class);
-        newUser = userService.registerUser(newUser);
-        if (newUser != null) {
-            res.status(200);
-            return new Gson().toJson(newUser);
-        }
-        else {
-            res.status(404);
-            return "";
-        }
 
+        RegisterRequest registeredUser = userService.registerUser(newUser);
+        res.status(200);
+        return new Gson().toJson(registeredUser);
     }
 
     private Object deleteEverything(Request req, Response res) {

@@ -9,22 +9,21 @@ import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO {
 
-//  ArrayList<UserData> users = new ArrayList<>();
-static Map<String, UserData> users = new HashMap<>();
+    Map<String, UserData> users = new HashMap<>();
 
-  @Override
-  public void clear() {
-    users.clear();
-  }
+    @Override
+    public void clear() {
+      users.clear();
+    }
 
-  @Override
-  public UserData addUser(UserData newUser) {
-    users.put(newUser.username(), newUser);
-    return newUser;
-  }
-  @Override
-  public String getUser(String username) {
-    return users.get(username).username();
-  }
+    @Override
+    public UserData addUser(UserData newUser) {
+        users.put(newUser.username(), newUser);
+        return newUser;
+    }
+    @Override
+    public UserData getUser(String username) {
+        return users.get(username);
+    }
 
 }
