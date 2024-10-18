@@ -10,4 +10,6 @@ public interface UserDAO {
 
   public void clear();
   public UserData addUser(UserData newUser);
+
+  public String getUser(String username);
 }

@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -47,11 +48,17 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private String createUser(Request req, Response res) {
+    private String createUser(Request req, Response res) throws DataAccessException {
         UserData newUser = new Gson().fromJson(req.body(), UserData.class);
         newUser = userService.registerUser(newUser);
-        res.status(200);
-        return new Gson().toJson(newUser);
+        if (newUser != null) {
+            res.status(200);
+            return new Gson().toJson(newUser);
+        }
+        else {
+            res.status(404);
+            return "";
+        }
 
     }
 

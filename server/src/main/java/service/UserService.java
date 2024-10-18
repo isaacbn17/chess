@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import model.UserData;
 
@@ -14,10 +16,14 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public UserData registerUser(UserData newUser) {
-      userDAO.addUser(newUser);
-      authDAO.addAuthToken(newUser.username());
+    public UserData registerUser(UserData newUser) throws DataAccessException {
+        if (userDAO.getUser(newUser.username()) != null) {
+            throw new DataAccessException("User already exists");
+        }
+        userDAO.addUser(newUser);
+        authDAO.addAuthToken(newUser.username());
 
-      return newUser;
+        return newUser;
+        // return dataAccess.getUser(newUser.username());
     }
 }
