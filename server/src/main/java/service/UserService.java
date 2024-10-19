@@ -36,25 +36,24 @@ public class UserService {
 
     public RegisterRequest loginUser(LoginRequest loginRequest) throws DataAccessException {
         String username = loginRequest.username();
-        String password =loginRequest.password();
-        if (username == null || password == null ||
-                username.isEmpty() || password.isEmpty()) {
+        String password = loginRequest.password();
+        if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
             throw new DataAccessException("Error: unauthorized");
         }
-        if (userDAO.getUser(username) == null) {
-            throw new DataAccessException("Error: unauthorized");
-        }
+        if (userDAO.getUser(username) == null) { throw new DataAccessException("Error: unauthorized"); }
         UserData userData = userDAO.getUser(username);
-        if (! Objects.equals(password, userData.password())) {
-            throw new DataAccessException("Error: unauthorized");
-        }
-        return new RegisterRequest(username, authDAO.getAuthData().get(username).authToken());
+        if (! Objects.equals(password, userData.password())) { throw new DataAccessException("Error: unauthorized"); }
+
+        AuthData authData = authDAO.addAuthData(username);
+
+        return new RegisterRequest(username, authData.authToken());
     }
 
     public void logoutUser(String authToken) throws DataAccessException {
-        if (! authDAO.getAuthTokens().contains(authToken)) {
+        if (! authDAO.getAuthData().containsKey(authToken)) {
             throw new DataAccessException("Error: unauthorized");
         }
-        authDAO.getAuthTokens().remove(authToken);
+        authDAO.getAuthData().remove(authToken);
+
     };
 }

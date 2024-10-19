@@ -74,7 +74,6 @@ public class Server {
     }
     private Object logoutUser(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
-        System.out.println(authToken);
         userService.logoutUser(authToken);
         res.status(200);
         return "";

@@ -11,5 +11,4 @@ public interface AuthDAO {
   public void clear();
   public AuthData addAuthData(String username);
   public Map<String, AuthData> getAuthData();
-  public Set<String> getAuthTokens();
 }
