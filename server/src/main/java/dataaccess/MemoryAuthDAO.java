@@ -32,4 +32,9 @@ public class MemoryAuthDAO implements AuthDAO {
         return authDataMap;
     }
 
+    @Override
+    public Set<Integer> getAuthTokens() {
+        return authTokens;
+    }
+
 }

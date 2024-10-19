@@ -50,4 +50,12 @@ public class UserService {
         }
         return new RegisterRequest(username, authDAO.getAuthData().get(username).authToken());
     }
+
+    public void logoutUser(String authTok) throws DataAccessException {
+        Integer authToken = Integer.parseInt(authTok);
+        if (! authDAO.getAuthTokens().contains(authToken)) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        authDAO.getAuthTokens().remove(authToken);
+    };
 }

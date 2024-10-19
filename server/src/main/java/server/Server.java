@@ -36,11 +36,15 @@ public class Server {
         Spark.post("/user", (req, res) -> createUser(req, res));
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/session", this::loginUser);
+        Spark.delete("/session", this::logoutUser);
+        Spark.get("/game", this::listGames);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
     }
+
+
     public void exceptionHandler(Exception ex, Request req, Response res) {
         String message = ex.getMessage();
         if (Objects.equals(message, "Error: bad request")) {
@@ -61,7 +65,16 @@ public class Server {
             res.body(new Gson().toJson(new ErrorMessage(message)));
         }
     }
-    private Object loginUser(Request req, Response res) throws DataAccessException {
+
+    private Object listGames(Request req, Response res) throws DataAccessException {
+        return "";
+    }
+    private Object logoutUser(Request req, Response res) throws DataAccessException {
+//        String authToken = new Gson().fromJson(req.body());
+        res.status(200);
+        return "";
+    }
+    private String loginUser(Request req, Response res) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
 
         RegisterRequest authenticatedUser = userService.loginUser(loginRequest);
