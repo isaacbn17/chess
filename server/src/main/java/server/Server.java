@@ -9,6 +9,7 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.*;
 import service.Delete;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
@@ -25,6 +26,7 @@ public class Server {
 
     private UserService userService = new UserService(userDAO, authDAO);
     private Delete delete = new Delete(userDAO, gameDAO, authDAO);
+    private GameService gameService = new GameService(gameDAO, authDAO);
 
 
     public int run(int desiredPort) {
@@ -67,10 +69,13 @@ public class Server {
     }
 
     private Object listGames(Request req, Response res) throws DataAccessException {
+        gameService.listGames();
         return "";
     }
     private Object logoutUser(Request req, Response res) throws DataAccessException {
-//        String authToken = new Gson().fromJson(req.body());
+        String authToken = req.headers("authorization");
+        System.out.println(authToken);
+        userService.logoutUser(authToken);
         res.status(200);
         return "";
     }

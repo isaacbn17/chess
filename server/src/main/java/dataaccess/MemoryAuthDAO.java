@@ -7,8 +7,8 @@ import model.AuthData;
 
 public class MemoryAuthDAO implements AuthDAO {
     Map<String, AuthData> authDataMap = new HashMap<>();
-    Set<Integer> authTokens = new HashSet<>();
-//    Integer authToken = 1000;
+    Set<String> authTokens = new HashSet<>();
+
     @Override
     public void clear() {
       authDataMap.clear();
@@ -16,15 +16,11 @@ public class MemoryAuthDAO implements AuthDAO {
 
     @Override
     public AuthData addAuthData(String username) {
-      int authToken = 1000 + new Random().nextInt(9000);
-      while (authTokens.contains(authToken)) {
-          authToken = 1000 + new Random().nextInt(9000);
-      }
-      authTokens.add(authToken);
+        String authToken = UUID.randomUUID().toString();
 
-      AuthData authData = new AuthData(Integer.toString(authToken), username);
-      authDataMap.put(username, authData);
-      return authData;
+        AuthData authData = new AuthData(authToken, username);
+        authDataMap.put(username, authData);
+        return authData;
     }
 
     @Override
@@ -33,7 +29,7 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public Set<Integer> getAuthTokens() {
+    public Set<String> getAuthTokens() {
         return authTokens;
     }
 
