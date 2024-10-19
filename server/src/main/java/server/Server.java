@@ -35,6 +35,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (req, res) -> createUser(req, res));
         Spark.delete("/db", this::deleteEverything);
+        Spark.post("/session", this::loginUser);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -56,9 +57,12 @@ public class Server {
             res.body(new Gson().toJson(new ErrorMessage(message)));
         }
     }
-    public void stop() {
-        Spark.stop();
-        Spark.awaitStop();
+    private Object loginUser(Request req, Response res) throws DataAccessException {
+        LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
+
+        RegisterRequest authenticatedUser = userService.loginUser(loginRequest);
+        res.status(200);
+        return new Gson().toJson(authenticatedUser);
     }
 
     private String createUser(Request req, Response res) throws DataAccessException {
@@ -70,8 +74,8 @@ public class Server {
             return new Gson().toJson(registeredUser);
         } catch (JsonSyntaxException ex) {
             exceptionHandler(ex, req, res);
+            return "";
         }
-        return "";
     }
 
     private String deleteEverything(Request req, Response res) {
@@ -80,5 +84,9 @@ public class Server {
         delete.clearAuthTokens();
         res.status(200);
         return "";
+    }
+    public void stop() {
+        Spark.stop();
+        Spark.awaitStop();
     }
 }

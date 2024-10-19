@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
+import model.LoginRequest;
 import model.RegisterRequest;
 import model.UserData;
 
@@ -31,5 +32,22 @@ public class UserService {
         userDAO.addUser(newUser);
         AuthData authData = authDAO.addAuthToken(newUser.username());
         return new RegisterRequest(newUser.username(), authData.authToken());
+    }
+
+    public RegisterRequest loginUser(LoginRequest loginRequest) throws DataAccessException {
+        String username = loginRequest.username();
+        String password =loginRequest.password();
+        if (username == null || password == null ||
+                username.isEmpty() || password.isEmpty()) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        if (userDAO.getUser(username) == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        UserData userData = userDAO.getUser(username);
+        if (! Objects.equals(password, userData.password())) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        return new RegisterRequest(username, authDAO.getAuthData().get(username).authToken());
     }
 }
