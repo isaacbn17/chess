@@ -89,7 +89,7 @@ public class Server {
     private Object listGames(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
 
-        ArrayList<GameList> games = gameService.listGames(authToken);
+        ArrayList<GameSimplified> games = gameService.listGames(authToken);
         res.status(200);
         return new Gson().toJson(games);
     }

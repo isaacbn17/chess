@@ -16,14 +16,14 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public ArrayList<GameList> listGames(String authToken) throws DataAccessException {
+    public ArrayList<GameSimplified> listGames(String authToken) throws DataAccessException {
         if (! authDAO.getAuthData().containsKey(authToken)) {
             throw new DataAccessException("Error: unauthorized");
         }
         HashMap<Integer, GameData> games = gameDAO.getGames();
-        ArrayList<GameList> gamesReturn = new ArrayList<>();
+        ArrayList<GameSimplified> gamesReturn = new ArrayList<>();
         for (GameData game : games.values()) {
-            gamesReturn.add(new GameList(game.gameID(), game.whiteUserName(), game.blackUsername(), game.gameName()));
+            gamesReturn.add(new GameSimplified(game.gameID(), game.whiteUserName(), game.blackUsername(), game.gameName()));
         }
         return gamesReturn;
     }
@@ -43,7 +43,13 @@ public class GameService {
         if (! authDAO.getAuthData().containsKey(authToken)) { throw new DataAccessException("Error: unauthorized"); }
         if ( joinRequest.gameID() == null) { throw new DataAccessException("Error: bad request"); }
         GameData game = gameDAO.getGame(joinRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request");
+        }
         String color = joinRequest.playerColor();
+        if (color == null) {
+            throw new DataAccessException("Error: bad request");
+        }
         if (Objects.equals(color, "WHITE") && game.whiteUserName() != null) {
             throw new DataAccessException("Error: already taken");
         }
