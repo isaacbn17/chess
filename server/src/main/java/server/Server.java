@@ -42,6 +42,7 @@ public class Server {
         Spark.delete("/session", this::logoutUser);
         Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGames);
+        Spark.put("/game", this::joinGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -69,21 +70,28 @@ public class Server {
         }
     }
 
+    private Object joinGame(Request req, Response res) {
+
+        return "";
+    }
     private Object createGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
         GameData game = gameService.createGame(authToken, gameNameObj.gameName());
         res.status(200);
-        Integer gameID = game.gameID();
 
+        Integer gameID = game.gameID();
         JsonObject newGame = new JsonObject();
         newGame.addProperty("gameID", gameID);
 
         return new Gson().toJson(newGame);
     }
     private Object listGames(Request req, Response res) throws DataAccessException {
-        gameService.listGames();
-        return "";
+        String authToken = req.headers("authorization");
+
+        ArrayList<GameList> games = gameService.listGames(authToken);
+        res.status(200);
+        return new Gson().toJson(games);
     }
     private Object logoutUser(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
