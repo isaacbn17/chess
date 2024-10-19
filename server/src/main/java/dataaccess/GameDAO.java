@@ -9,6 +9,9 @@ public interface GameDAO {
   public void clear();
   public GameData addGame(String gameName);
 
-  public ArrayList<GameData> getGames();
+  public HashMap<Integer, GameData> getGames();
 
+  GameData getGame(Integer gameID);
+
+  void updateGames(GameData newGame);
 }

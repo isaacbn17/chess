@@ -3,7 +3,6 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.MalformedJsonException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
@@ -14,10 +13,7 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class Server {
@@ -70,10 +66,14 @@ public class Server {
         }
     }
 
-    private Object joinGame(Request req, Response res) {
-
+    private Object joinGame(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization");
+        JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+        gameService.joinGame(authToken, joinRequest);
+        res.status(200);
         return "";
     }
+
     private Object createGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
