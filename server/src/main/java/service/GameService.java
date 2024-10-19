@@ -1,10 +1,7 @@
 package service;
 
 import dataaccess.*;
-import model.AuthData;
-import model.LoginRequest;
-import model.RegisterRequest;
-import model.UserData;
+import model.*;
 
 import java.util.Objects;
 
@@ -19,5 +16,13 @@ public class GameService {
 
     public void listGames() {
 
+    }
+
+    public GameData createGame(String authToken, String gameName) throws DataAccessException {
+        if (! authDAO.getAuthData().containsKey(authToken)) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+
+        return gameDAO.addGame(gameName);
     }
 }

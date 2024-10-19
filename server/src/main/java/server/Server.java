@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.MalformedJsonException;
 import dataaccess.DataAccessException;
@@ -39,13 +40,13 @@ public class Server {
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
+        Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGames);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
     }
-
 
     public void exceptionHandler(Exception ex, Request req, Response res) {
         String message = ex.getMessage();
@@ -68,6 +69,18 @@ public class Server {
         }
     }
 
+    private Object createGame(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization");
+        GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
+        GameData game = gameService.createGame(authToken, gameNameObj.gameName());
+        res.status(200);
+        Integer gameID = game.gameID();
+
+        JsonObject newGame = new JsonObject();
+        newGame.addProperty("gameID", gameID);
+
+        return new Gson().toJson(newGame);
+    }
     private Object listGames(Request req, Response res) throws DataAccessException {
         gameService.listGames();
         return "";
