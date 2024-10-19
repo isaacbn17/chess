@@ -14,6 +14,8 @@ import service.UserService;
 import spark.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Server {
@@ -80,18 +82,20 @@ public class Server {
         GameData game = gameService.createGame(authToken, gameNameObj.gameName());
         res.status(200);
 
-        Integer gameID = game.gameID();
-        JsonObject newGame = new JsonObject();
-        newGame.addProperty("gameID", gameID);
+        Map<String, Integer> response = new HashMap<>();
+        response.put("gameID", game.gameID());
 
-        return new Gson().toJson(newGame);
+        return new Gson().toJson(response);
     }
     private Object listGames(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
-
         ArrayList<GameSimplified> games = gameService.listGames(authToken);
         res.status(200);
-        return new Gson().toJson(games);
+
+        Map<String, ArrayList<GameSimplified>> response = new HashMap<>();
+        response.put("games", games);
+
+        return new Gson().toJson(response);
     }
     private Object logoutUser(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
