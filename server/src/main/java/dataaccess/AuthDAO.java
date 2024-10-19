@@ -8,6 +8,6 @@ import model.AuthData;
 
 public interface AuthDAO {
   public void clear();
-  public AuthData addAuthToken(String username);
+  public AuthData addAuthData(String username);
   public Map<String, AuthData> getAuthData();
 }

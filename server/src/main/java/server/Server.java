@@ -52,6 +52,10 @@ public class Server {
             res.body(new Gson().toJson(new ErrorMessage(message)));
 
         }
+        else if (Objects.equals(message, "Error: unauthorized")) {
+            res.status(401);
+            res.body(new Gson().toJson(new ErrorMessage(message)));
+        }
         else {
             res.status(500);
             res.body(new Gson().toJson(new ErrorMessage(message)));

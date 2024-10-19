@@ -1,32 +1,35 @@
 package dataaccess;
 
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 import model.AuthData;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 public class MemoryAuthDAO implements AuthDAO {
-    Map<String, AuthData> authTokens = new HashMap<>();
-
+    Map<String, AuthData> authDataMap = new HashMap<>();
+    Set<Integer> authTokens = new HashSet<>();
+//    Integer authToken = 1000;
     @Override
     public void clear() {
-      authTokens.clear();
+      authDataMap.clear();
     }
 
     @Override
-    public AuthData addAuthToken(String username) {
+    public AuthData addAuthData(String username) {
       int authToken = 1000 + new Random().nextInt(9000);
+      while (authTokens.contains(authToken)) {
+          authToken = 1000 + new Random().nextInt(9000);
+      }
+      authTokens.add(authToken);
 
       AuthData authData = new AuthData(Integer.toString(authToken), username);
-      authTokens.put(username, authData);
+      authDataMap.put(username, authData);
       return authData;
     }
 
     @Override
     public Map<String, AuthData> getAuthData() {
-        return authTokens;
+        return authDataMap;
     }
 
 }

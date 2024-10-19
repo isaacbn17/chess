@@ -30,7 +30,7 @@ public class UserService {
             throw new DataAccessException("Error: already taken");
         }
         userDAO.addUser(newUser);
-        AuthData authData = authDAO.addAuthToken(newUser.username());
+        AuthData authData = authDAO.addAuthData(newUser.username());
         return new RegisterRequest(newUser.username(), authData.authToken());
     }
 
