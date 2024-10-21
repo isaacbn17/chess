@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
@@ -14,18 +13,15 @@ import service.UserService;
 import spark.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class Server {
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private final MemoryUserDAO userDAO = new MemoryUserDAO();
+    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
-    private UserService userService = new UserService(userDAO, authDAO);
-    private Delete delete = new Delete(userDAO, gameDAO, authDAO);
-    private GameService gameService = new GameService(gameDAO, authDAO);
+    private final UserService userService = new UserService(userDAO, authDAO);
+    private final Delete delete = new Delete(userDAO, gameDAO, authDAO);
+    private final GameService gameService = new GameService(gameDAO, authDAO);
 
 
     public int run(int desiredPort) {
@@ -34,7 +30,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", (req, res) -> createUser(req, res));
+        Spark.post("/user", this::createUser);
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
@@ -49,22 +45,23 @@ public class Server {
 
     public void exceptionHandler(Exception ex, Request req, Response res) {
         String message = ex.getMessage();
-        if (Objects.equals(message, "Error: bad request")) {
-            res.status(400);
-            res.body(new Gson().toJson(new ErrorMessage(message)));
-        }
-        else if (Objects.equals(message, "Error: already taken")) {
-            res.status(403);
-            res.body(new Gson().toJson(new ErrorMessage(message)));
-
-        }
-        else if (Objects.equals(message, "Error: unauthorized")) {
-            res.status(401);
-            res.body(new Gson().toJson(new ErrorMessage(message)));
-        }
-        else {
-            res.status(500);
-            res.body(new Gson().toJson(new ErrorMessage(message)));
+        switch (message) {
+            case "Error: bad request" -> {
+                res.status(400);
+                res.body(new Gson().toJson(new ErrorMessage(message)));
+            }
+            case "Error: unauthorized" -> {
+                res.status(401);
+                res.body(new Gson().toJson(new ErrorMessage(message)));
+            }
+            case "Error: already taken" -> {
+                res.status(403);
+                res.body(new Gson().toJson(new ErrorMessage(message)));
+            }
+            case null, default -> {
+                res.status(500);
+                res.body(new Gson().toJson(new ErrorMessage(message)));
+            }
         }
     }
 

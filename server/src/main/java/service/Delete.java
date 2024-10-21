@@ -1,12 +1,6 @@
 package service;
 
 import dataaccess.*;
-import model.UserData;
-import model.GameData;
-import model.AuthData;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Delete {
 

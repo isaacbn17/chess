@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.LoginRequest;
@@ -54,6 +53,5 @@ public class UserService {
             throw new DataAccessException("Error: unauthorized");
         }
         authDAO.getAuthData().remove(authToken);
-
-    };
+    }
 }

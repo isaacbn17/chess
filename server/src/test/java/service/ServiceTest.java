@@ -4,11 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.*;
-
-import javax.xml.crypto.Data;
-
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +32,7 @@ class ServiceTest {
         assertEquals("a", game.whiteUsername());
     }
     @Test
-    public void createGameBadRequest() throws DataAccessException {
+    public void createGameBadRequest() {
         assertThrows(DataAccessException.class, () -> gameService.createGame("hi", "game2"));
     }
     @Test
@@ -59,7 +55,7 @@ class ServiceTest {
         assertEquals(expected, actual);
     }
     @Test
-    public void listGamesBadRequest() throws DataAccessException {
+    public void listGamesBadRequest() {
         assertThrows(DataAccessException.class, () -> gameService.listGames("My friend hello"));
     }
     @Test
@@ -70,7 +66,7 @@ class ServiceTest {
         assertFalse(authDAO.getAuthData().containsKey("a"));
     }
     @Test
-    public void logoutUserBadRequest() throws DataAccessException {
+    public void logoutUserBadRequest() {
         assertThrows(DataAccessException.class, () -> userService.logoutUser("Not a token"));
     }
     @Test
@@ -83,22 +79,22 @@ class ServiceTest {
         Assertions.assertEquals(loginRequest.username(), actual.username());
     }
     @Test
-    public void loginUserBadRequest() throws DataAccessException {
+    public void loginUserBadRequest() {
         assertThrows(DataAccessException.class, () -> userService.loginUser(new LoginRequest("a", "f")));
     }
     @Test
-    public void registerUser() {;
+    public void registerUser() {
         var expected = new UserData("a", "b", "c.com");
         userDAO.addUser(expected);
         var actual=userDAO.getUser("a");
         Assertions.assertEquals(expected, actual);
     }
     @Test
-    public void registerUserBadRequest() throws Exception {
+    public void registerUserBadRequest() {
         var user = new UserData("a", "b", "");
         assertThrows(DataAccessException.class, () -> userService.registerUser(user));
     }
-    @Test void clear() throws DataAccessException {
+    @Test void clear() {
         gameDAO.addGame("Party");
         gameDAO.clear();
         assertEquals(0, gameDAO.getGames().size());

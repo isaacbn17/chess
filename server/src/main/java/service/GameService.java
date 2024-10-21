@@ -5,7 +5,6 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class GameService {
     GameDAO gameDAO;
@@ -51,9 +50,6 @@ public class GameService {
             if (game.whiteUsername() != null) { throw new DataAccessException("Error: already taken"); }
             AuthData authData=authDAO.getAuthData().get(authToken);
             return gameDAO.updateGames(game.gameID(), "WHITE", authData.username());
-
-//            GameData newGame=new GameData(game.gameID(), authData.username(), game.blackUsername(), game.gameName(), game.game());
-//            gameDAO.updateGames(game.gameID());
         }
         else if (color.equalsIgnoreCase("BLACK")) {
             if (game.blackUsername() != null) { throw new DataAccessException("Error: already taken"); }
