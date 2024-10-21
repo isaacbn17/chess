@@ -81,11 +81,9 @@ public class Server {
         GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
         GameData game = gameService.createGame(authToken, gameNameObj.gameName());
         res.status(200);
+        GameCreateResult newGame = new GameCreateResult(game.gameID());
 
-        Map<String, Integer> response = new HashMap<>();
-        response.put("gameID", game.gameID());
-
-        return new Gson().toJson(response);
+        return new Gson().toJson(newGame);
     }
     private Object listGames(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
