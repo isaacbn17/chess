@@ -71,11 +71,11 @@ public class Server {
     private Object joinGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
-        gameService.joinGame(authToken, joinRequest);
+        GameData game = gameService.joinGame(authToken, joinRequest);
         res.status(200);
+        System.out.println(game.gameID() + " " + game.whiteUsername());
         return "";
     }
-
     private Object createGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
@@ -91,11 +91,8 @@ public class Server {
         String authToken = req.headers("authorization");
         ArrayList<GameSimplified> games = gameService.listGames(authToken);
         res.status(200);
-
-        Map<String, ArrayList<GameSimplified>> response = new HashMap<>();
-        response.put("games", games);
-
-        return new Gson().toJson(response);
+        ListGameResult returnVal = new ListGameResult(games);
+        return new Gson().toJson(returnVal);
     }
     private Object logoutUser(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");

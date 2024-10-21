@@ -1,3 +1,3 @@
 package model;
 
-public record GameSimplified(int gameID, String whiteUserName, String blackUsername, String gameName) { }
+public record GameSimplified(int gameID, String whiteUsername, String blackUsername, String gameName) { }

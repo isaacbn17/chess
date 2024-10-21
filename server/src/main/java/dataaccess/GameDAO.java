@@ -10,5 +10,5 @@ public interface GameDAO {
   public GameData addGame(String gameName);
   public HashMap<Integer, GameData> getGames();
   public GameData getGame(Integer gameID);
-  public void updateGames(GameData newGame);
+  public GameData updateGames(int gameID, String color, String username);
 }

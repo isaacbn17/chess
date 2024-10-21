@@ -5,6 +5,7 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
     private HashMap<Integer, GameData> games = new HashMap<>();
@@ -35,10 +36,19 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void updateGames(GameData newGame) {
-        Integer gameID = newGame.gameID();
-        games.remove(gameID);
-        games.put(gameID, newGame);
+    public GameData updateGames(int gameID, String color, String username) {
+        if (color.equalsIgnoreCase("WHITE")) {
+            GameData game = games.get(gameID);
+            GameData newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+            games.put(gameID, newGame);
+            return games.get(gameID);
+        }
+        else {
+            GameData game = games.get(gameID);
+            GameData newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+            games.put(gameID, newGame);
+            return games.get(gameID);
+        }
     }
 
 }

@@ -1,37 +1,27 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import model.AuthData;
-import model.LoginRequest;
-import model.RegisterRequest;
-import model.UserData;
+import chess.ChessGame;
+import dataaccess.*;
+import model.*;
 import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.*;
+
+import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ServiceTest {
-
-    @BeforeAll
-    static void addTest() {
-    }
-
-    @BeforeEach
-    void addTest2() {
-    }
-
-    @AfterAll
-    static void addTest3() {
-    }
-
-    @AfterEach
-    void addTest4() {
-    }
-    // @Disabled
-    // @ParameterizedTest
-
+//    @BeforeAll
+//    @BeforeEach
+//    @AfterAll
+//    @AfterEach
+//    @Disabled
+//    @ParameterizedTest
+    UserDAO userDAO = new MemoryUserDAO();
+    AuthDAO authDAO = new MemoryAuthDAO();
+    GameDAO gameDAO = new MemoryGameDAO();
+    UserService userService = new UserService(userDAO, authDAO);
+    GameService gameService = new GameService(gameDAO, authDAO);
     @Test
     void examples() {
         assertEquals(2, 1 + 1);
@@ -42,10 +32,37 @@ class ServiceTest {
     }
 
     @Test
+    public void joinGameBadRequest() throws DataAccessException {
+        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        GameData game = gameService.createGame(registerResult.authToken(), "game1");
+        JoinRequest joinRequest = new JoinRequest("WHITE", game.gameID());
+        assertThrows(DataAccessException.class, () -> gameService.joinGame("hello", joinRequest));
+    }
+    @Test
+    public void joinGame() throws DataAccessException {
+        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        GameData game = gameService.createGame(registerResult.authToken(), "game1");
+        JoinRequest joinRequest = new JoinRequest("WHITE", game.gameID());
+        game = gameService.joinGame(registerResult.authToken(), joinRequest);
+        assertEquals("a", game.whiteUsername());
+    }
+
+    @Test
+    public void createGameBadRequest() throws DataAccessException {
+        assertThrows(DataAccessException.class, () -> gameService.createGame("hi", "game2"));
+    }
+    @Test
+    public void createGame() throws DataAccessException {
+        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        GameData game = gameService.createGame(registerResult.authToken(), "game1");
+        int gameID = game.gameID();
+        ChessGame chessGame = game.game();
+        GameData expectedGame = new GameData(gameID, null, null, "game1", chessGame);
+        assertEquals(expectedGame, game);
+    }
+
+    @Test
     public void logoutUser() throws DataAccessException {
-        var userDAO = new MemoryUserDAO();
-        var authDAO = new MemoryAuthDAO();
-        var userService = new UserService(userDAO, authDAO);
 
         RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
 
@@ -56,9 +73,6 @@ class ServiceTest {
 
     @Test
     public void loginUser() throws DataAccessException {
-        var userDAO = new MemoryUserDAO();
-        var authDAO = new MemoryAuthDAO();
-        var userService = new UserService(userDAO, authDAO);
         RegisterRequest registered = userService.registerUser(new UserData("a", "b", "c.com"));
         userService.logoutUser(registered.authToken());
 
@@ -69,11 +83,7 @@ class ServiceTest {
 
     @Test
     public void loginUserBadRequest() throws DataAccessException {
-        var userDAO = new MemoryUserDAO();
-        var authDAO = new MemoryAuthDAO();
-        var userService = new UserService(userDAO, authDAO);
-
-        RegisterRequest expected = userService.registerUser(new UserData("a", "b", "c.com"));
+//        RegisterRequest expected = userService.registerUser(new UserData("a", "b", "c.com"));
         assertThrows(DataAccessException.class, () -> userService.loginUser(new LoginRequest("a", "f")));
     }
 
