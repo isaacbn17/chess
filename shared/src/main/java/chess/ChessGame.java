@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.HashSet;
 
     public class ChessGame {
@@ -90,14 +89,10 @@ import java.util.HashSet;
                 if (move.getPromotionPiece() != null) {
                     ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
                     board.addPiece(move.getEndPosition(), promotionPiece);
-                    board.removePiece(move.getStartPosition());
-                    setTeamTurn(getOppositeColor(color));
                 }
-                else {
-                    board.addPiece(move.getEndPosition(), piece);
-                    board.removePiece(move.getStartPosition());
-                    setTeamTurn(getOppositeColor(color));
-                }
+                else { board.addPiece(move.getEndPosition(), piece); }
+                board.removePiece(move.getStartPosition());
+                setTeamTurn(getOppositeColor(color));
             }
             else {
                 throw new InvalidMoveException("Invalid move");
@@ -119,10 +114,10 @@ import java.util.HashSet;
             HashSet<ChessMove> moves = new HashSet<>();
             HashSet<ChessPosition> opposingTeamPositions;
             if (teamColor == TeamColor.BLACK) {
-                opposingTeamPositions = getTeamPositions(TeamColor.WHITE);
+                opposingTeamPositions = getPositions(TeamColor.WHITE);
             }
             else {
-                opposingTeamPositions = getTeamPositions(TeamColor.BLACK);
+                opposingTeamPositions = getPositions(TeamColor.BLACK);
             }
             for (ChessPosition position : opposingTeamPositions) {
                 ChessPiece piece = board.getPiece(position);
@@ -159,7 +154,7 @@ import java.util.HashSet;
 
         public boolean isInCheckmate(TeamColor teamColor) {
             if (isInCheck(teamColor)) {
-                HashSet<ChessPosition> teamPositions = getTeamPositions(teamColor);
+                HashSet<ChessPosition> teamPositions = getPositions(teamColor);
                 for (ChessPosition position : teamPositions) {
                     if (! validMoves(position).isEmpty()) {
                         return false;
@@ -170,7 +165,7 @@ import java.util.HashSet;
             return false;
         }
 
-        private HashSet<ChessPosition> getTeamPositions(TeamColor teamColor) {
+        private HashSet<ChessPosition> getPositions(TeamColor teamColor) {
             HashSet<ChessPosition> teamPositions = new HashSet<>();
             for (int i=1; i<9; i++) {
                 for (int j=1; j<9; j++) {
@@ -186,7 +181,7 @@ import java.util.HashSet;
         public boolean isInStalemate(TeamColor teamColor) {
             ChessPosition kingPosition = findKing(teamColor);
             if (kingPosition == null) { return false; }
-            for (ChessPosition position : getTeamPositions(teamColor)) {
+            for (ChessPosition position : getPositions(teamColor)) {
                 ChessPiece piece = board.getPiece(position);
                 if (piece.getPieceType() != ChessPiece.PieceType.KING) {
                     if (! piece.pieceMoves(board, position).isEmpty()) {
