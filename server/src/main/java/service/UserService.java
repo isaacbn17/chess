@@ -2,11 +2,13 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.SQLAuthDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.LoginRequest;
 import model.RegisterRequest;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -20,6 +22,10 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
     public RegisterRequest registerUser(UserData newUser) throws DataAccessException {
         if (newUser.username() == null || newUser.password() == null || newUser.email() == null ||
                 newUser.username().isEmpty() || newUser.password().isEmpty() || newUser.email().isEmpty()) {
@@ -28,7 +34,8 @@ public class UserService {
         if (userDAO.getUser(newUser.username()) != null) {
             throw new DataAccessException("Error: already taken");
         }
-        userDAO.addUser(newUser);
+        String hashedPassword = hashPassword(newUser.password());
+        userDAO.addUser(new UserData(newUser.username(), hashedPassword, newUser.email()));
         AuthData authData = authDAO.addAuthData(newUser.username());
         return new RegisterRequest(newUser.username(), authData.authToken());
     }
@@ -39,8 +46,8 @@ public class UserService {
         if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
             throw new DataAccessException("Error: unauthorized");
         }
-        if (userDAO.getUser(username) == null) { throw new DataAccessException("Error: unauthorized"); }
         UserData userData = userDAO.getUser(username);
+        if (userData == null) { throw new DataAccessException("Error: unauthorized"); }
         if (! Objects.equals(password, userData.password())) { throw new DataAccessException("Error: unauthorized"); }
 
         AuthData authData = authDAO.addAuthData(username);

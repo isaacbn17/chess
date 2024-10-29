@@ -83,7 +83,7 @@ class ServiceTest {
         assertThrows(DataAccessException.class, () -> userService.loginUser(new LoginRequest("a", "f")));
     }
     @Test
-    public void registerUser() {
+    public void registerUser() throws DataAccessException {
         var expected = new UserData("a", "b", "c.com");
         userDAO.addUser(expected);
         var actual=userDAO.getUser("a");

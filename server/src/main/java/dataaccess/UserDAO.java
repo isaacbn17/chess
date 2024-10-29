@@ -9,7 +9,7 @@ public interface UserDAO {
 
 
   public void clear() throws DataAccessException;
-  public UserData addUser(UserData newUser);
+  public UserData addUser(UserData newUser) throws DataAccessException;
 
-  public UserData getUser(String username);
+  public UserData getUser(String username) throws DataAccessException;
 }

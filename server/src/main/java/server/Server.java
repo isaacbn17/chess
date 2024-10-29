@@ -2,10 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.*;
 import service.Delete;
 import service.GameService;
@@ -15,13 +12,24 @@ import spark.*;
 import java.util.ArrayList;
 
 public class Server {
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private UserDAO userDAO = new MemoryUserDAO();
+    private GameDAO gameDAO = new MemoryGameDAO();
+    private AuthDAO authDAO = new MemoryAuthDAO();
 
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final Delete delete = new Delete(userDAO, gameDAO, authDAO);
-    private final GameService gameService = new GameService(gameDAO, authDAO);
+    private final UserService userService;
+    private final Delete delete;
+    private final GameService gameService;
+
+    public Server() {
+        try {
+            userDAO = new SQLUserDAO();
+            gameDAO = new SQLGameDAO();
+            authDAO = new SQLAuthDAO();
+        } catch (Exception ex) { System.out.println(ex); }
+        this.userService = new UserService(userDAO, authDAO);
+        this.delete = new Delete(userDAO, gameDAO, authDAO);
+        this.gameService = new GameService(gameDAO, authDAO);
+    }
 
 
     public int run(int desiredPort) {
