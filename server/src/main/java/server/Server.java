@@ -124,7 +124,7 @@ public class Server {
         }
     }
 
-    private String deleteEverything(Request req, Response res) {
+    private String deleteEverything(Request req, Response res) throws DataAccessException {
         delete.clearUsers();
         delete.clearGames();
         delete.clearAuthTokens();

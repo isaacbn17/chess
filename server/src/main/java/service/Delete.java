@@ -14,7 +14,7 @@ public class Delete {
         this.authDAO = authDAO;
     }
 
-    public void clearUsers() {
+    public void clearUsers() throws DataAccessException {
         userDAO.clear();
     }
     public void clearGames() {
