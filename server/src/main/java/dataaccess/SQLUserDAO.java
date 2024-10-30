@@ -48,7 +48,17 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String password = rs.getString("password");
+                        String email = rs.getString("email");
+
+                        return new UserData(username, password, email);
+                    }
+                }
+            }
         } catch (Exception ex) {
             throw new DataAccessException("Error: bad request");
         }
