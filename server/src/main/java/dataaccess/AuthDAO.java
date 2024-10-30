@@ -8,7 +8,7 @@ import java.util.Set;
 import model.AuthData;
 
 public interface AuthDAO {
-  public void clear();
-  public AuthData addAuthData(String username);
-  public Map<String, AuthData> getAuthData();
+  public void clear() throws DataAccessException;
+  public AuthData addAuthData(String username) throws DataAccessException;
+  public Map<String, AuthData> getAuthData() throws DataAccessException;
 }

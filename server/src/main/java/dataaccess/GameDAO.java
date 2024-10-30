@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface GameDAO {
-  public void clear();
-  public GameData addGame(String gameName);
-  public HashMap<Integer, GameData> getGames();
-  public GameData getGame(Integer gameID);
-  public GameData updateGames(int gameID, String color, String username);
+  public void clear() throws DataAccessException;
+  public GameData addGame(String gameName) throws DataAccessException;
+  public HashMap<Integer, GameData> getGames() throws DataAccessException;
+  public GameData getGame(Integer gameID) throws DataAccessException;
+  public GameData updateGames(int gameID, String color, String username) throws DataAccessException;
 }

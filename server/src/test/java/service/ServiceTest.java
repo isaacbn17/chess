@@ -94,7 +94,7 @@ class ServiceTest {
         var user = new UserData("a", "b", "");
         assertThrows(DataAccessException.class, () -> userService.registerUser(user));
     }
-    @Test void clear() {
+    @Test void clear() throws DataAccessException {
         gameDAO.addGame("Party");
         gameDAO.clear();
         assertEquals(0, gameDAO.getGames().size());

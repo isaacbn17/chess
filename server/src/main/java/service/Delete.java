@@ -17,10 +17,10 @@ public class Delete {
     public void clearUsers() throws DataAccessException {
         userDAO.clear();
     }
-    public void clearGames() {
+    public void clearGames() throws DataAccessException {
         gameDAO.clear();
     }
-    public void clearAuthTokens() {
+    public void clearAuthTokens() throws DataAccessException {
         authDAO.clear();
     }
 }
