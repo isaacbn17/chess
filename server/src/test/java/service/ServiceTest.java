@@ -63,7 +63,7 @@ class ServiceTest {
         RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
 
         userService.logoutUser(registerResult.authToken());
-        assertFalse(authDAO.getAuthData().containsKey("a"));
+        assertNull(authDAO.getAuthData(registerResult.authToken()));
     }
     @Test
     public void logoutUserBadRequest() {

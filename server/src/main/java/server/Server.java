@@ -25,7 +25,9 @@ public class Server {
             userDAO = new SQLUserDAO();
             gameDAO = new SQLGameDAO();
             authDAO = new SQLAuthDAO();
-        } catch (Exception ex) { System.out.println(ex); }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
         this.userService = new UserService(userDAO, authDAO);
         this.delete = new Delete(userDAO, gameDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);

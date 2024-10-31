@@ -56,9 +56,12 @@ public class UserService {
     }
 
     public void logoutUser(String authToken) throws DataAccessException {
-        if (! authDAO.getAuthData().containsKey(authToken)) {
+        if (authDAO.getAuthData(authToken) == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        authDAO.getAuthData().remove(authToken);
+//        if (! authDAO.getAuthData().containsKey(authToken)) {
+//            throw new DataAccessException("Error: unauthorized");
+//        }
+        authDAO.removeAuthToken(authToken);
     }
 }

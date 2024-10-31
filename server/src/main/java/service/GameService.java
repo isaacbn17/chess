@@ -16,7 +16,7 @@ public class GameService {
     }
 
     public ArrayList<GameSimplified> listGames(String authToken) throws DataAccessException {
-        if (! authDAO.getAuthData().containsKey(authToken)) {
+        if (authDAO.getAuthData(authToken) == null) {
             throw new DataAccessException("Error: unauthorized");
         }
         HashMap<Integer, GameData> games = gameDAO.getGames();
@@ -28,7 +28,7 @@ public class GameService {
     }
 
     public GameData createGame(String authToken, String gameName) throws DataAccessException {
-        if (! authDAO.getAuthData().containsKey(authToken)) {
+        if (authDAO.getAuthData(authToken) == null) {
             throw new DataAccessException("Error: unauthorized");
         }
         if (gameName == null || gameName.isEmpty()) {
@@ -39,7 +39,7 @@ public class GameService {
     }
 
     public GameData joinGame(String authToken, JoinRequest joinRequest) throws DataAccessException {
-        if (!authDAO.getAuthData().containsKey(authToken)) { throw new DataAccessException("Error: unauthorized"); }
+        if (authDAO.getAuthData(authToken) == null) { throw new DataAccessException("Error: unauthorized"); }
         if (joinRequest.gameID() == null) { throw new DataAccessException("Error: bad request"); }
         String color = joinRequest.playerColor();
         GameData game=gameDAO.getGame(joinRequest.gameID());
@@ -48,12 +48,12 @@ public class GameService {
         }
         if (color.equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null) { throw new DataAccessException("Error: already taken"); }
-            AuthData authData=authDAO.getAuthData().get(authToken);
+            AuthData authData=authDAO.getAuthData(authToken);
             return gameDAO.updateGames(game.gameID(), "WHITE", authData.username());
         }
         else if (color.equalsIgnoreCase("BLACK")) {
             if (game.blackUsername() != null) { throw new DataAccessException("Error: already taken"); }
-            AuthData authData=authDAO.getAuthData().get(authToken);
+            AuthData authData=authDAO.getAuthData(authToken);
             return gameDAO.updateGames(game.gameID(), "BLACK", authData.username());
         }
         else {

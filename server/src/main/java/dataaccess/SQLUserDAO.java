@@ -89,7 +89,7 @@ public class SQLUserDAO implements UserDAO {
               `blackUser` varchar(256),
               `gameName` varchar(256) NOT NULL,
               `game` longtext NOT NULL,
-              PRIMARY KEY (`id`),
+              PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

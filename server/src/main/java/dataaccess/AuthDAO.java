@@ -7,8 +7,11 @@ import java.util.Set;
 
 import model.AuthData;
 
+import javax.xml.crypto.Data;
+
 public interface AuthDAO {
   public void clear() throws DataAccessException;
   public AuthData addAuthData(String username) throws DataAccessException;
-  public Map<String, AuthData> getAuthData() throws DataAccessException;
+  public AuthData getAuthData(String authToken) throws DataAccessException;
+  public void removeAuthToken(String authToken) throws DataAccessException;
 }

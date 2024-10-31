@@ -42,8 +42,14 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public Map<String, AuthData> getAuthData() {
+    public AuthData getAuthData(String authToken) {
+
         return null;
+    }
+
+    @Override
+    public void removeAuthToken(String authToken) throws DataAccessException {
+
     }
 
 }
