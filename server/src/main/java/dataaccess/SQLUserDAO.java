@@ -1,15 +1,10 @@
 package dataaccess;
 
-import model.RegisterRequest;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 public class SQLUserDAO implements UserDAO {
 
