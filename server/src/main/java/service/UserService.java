@@ -59,9 +59,6 @@ public class UserService {
         if (authDAO.getAuthData(authToken) == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-//        if (! authDAO.getAuthData().containsKey(authToken)) {
-//            throw new DataAccessException("Error: unauthorized");
-//        }
         authDAO.removeAuthToken(authToken);
     }
 }

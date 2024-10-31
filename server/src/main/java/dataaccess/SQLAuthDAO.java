@@ -1,7 +1,9 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.AuthData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
@@ -42,9 +44,26 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuthData(String authToken) {
-
+    public AuthData getAuthData(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(
+                    "SELECT authToken, username FROM auth WHERE authToken=?")) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readAuth(rs);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
         return null;
+    }
+    private AuthData readAuth(ResultSet rs) throws SQLException {
+        String authToken = rs.getString("authToken");
+        String username = rs.getString("username");
+        return new AuthData(authToken, username);
     }
 
     @Override
