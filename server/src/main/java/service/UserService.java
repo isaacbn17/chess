@@ -48,7 +48,7 @@ public class UserService {
         }
         UserData userData = userDAO.getUser(username);
         if (userData == null) { throw new DataAccessException("Error: unauthorized"); }
-        if (! Objects.equals(password, userData.password())) { throw new DataAccessException("Error: unauthorized"); }
+        if (! BCrypt.checkpw(password, userData.password())) { throw new DataAccessException("Error: unauthorized"); }
 
         AuthData authData = authDAO.addAuthData(username);
 
