@@ -57,7 +57,8 @@ public class SQLGameDAO implements GameDAO {
                     "SELECT ALL FROM game")) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        addGame(games, rs);
+                        GameData gameData = getGameData(rs);
+                        games.put(gameData.gameID(), gameData);
                     }
                 }
             }
@@ -67,11 +68,7 @@ public class SQLGameDAO implements GameDAO {
         return games;
     }
 
-    private void addGame(HashMap<Integer, GameData> games, ResultSet rs) throws SQLException {
-        GameData gameData = getGameFromSQL(rs);
-        games.put(gameData.gameID(), gameData);
-    }
-    private GameData getGameFromSQL(ResultSet rs) throws SQLException {
+    private GameData getGameData(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String whiteUser = rs.getString("whiteUser");
         String blackUser = rs.getString("blackUser");
@@ -88,7 +85,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return getGameFromSQL(rs);
+                        return getGameData(rs);
                     }
                 }
             }
@@ -100,6 +97,26 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public GameData updateGames(int gameID, String color, String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            if (color.equals("WHITE")) {
+                try (var ps = conn.prepareStatement("UPDATE game SET whiteUser=? WHERE id=?")) {
+                    ps.setString(1, username);
+                    ps.setInt(2, gameID);
+                    ps.executeUpdate();
+                    getGame(gameID);
+                }
+            }
+            else {
+                try (var ps = conn.prepareStatement("UPDATE game SET blackUser=? WHERE id=?")) {
+                    ps.setString(1, username);
+                    ps.setInt(2, gameID);
+                    ps.executeUpdate();
+                    getGame(gameID);
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException("Error: bad request");
+        }
         return null;
     }
 }
