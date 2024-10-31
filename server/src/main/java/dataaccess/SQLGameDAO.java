@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
+import model.UserData;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -60,7 +61,6 @@ public class SQLGameDAO implements GameDAO {
                     }
                 }
             }
-
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
         }
@@ -68,18 +68,33 @@ public class SQLGameDAO implements GameDAO {
     }
 
     private void addGame(HashMap<Integer, GameData> games, ResultSet rs) throws SQLException {
+        GameData gameData = getGameFromSQL(rs);
+        games.put(gameData.gameID(), gameData);
+    }
+    private GameData getGameFromSQL(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String whiteUser = rs.getString("whiteUser");
         String blackUser = rs.getString("blackUser");
         String gameName = rs.getString("gameName");
         String game = rs.getString("game");
         ChessGame chessGame = new Gson().fromJson(game, ChessGame.class);
-        GameData gameData = new GameData(id, whiteUser, blackUser, gameName, chessGame);
-        games.put(id, gameData);
+        return new GameData(id, whiteUser, blackUser, gameName, chessGame);
     }
 
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement("SELECT ALL FROM game WHERE id=?")) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return getGameFromSQL(rs);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException("Error: bad request");
+        }
         return null;
     }
 
