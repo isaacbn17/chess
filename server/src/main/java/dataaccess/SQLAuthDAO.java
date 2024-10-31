@@ -1,11 +1,9 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.AuthData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -68,7 +66,15 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void removeAuthToken(String authToken) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(
+                    "DELETE FROM auth WHERE authToken=?")) {
+                ps.setString(1, authToken);
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
 }
