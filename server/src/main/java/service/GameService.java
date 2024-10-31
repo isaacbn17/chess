@@ -42,7 +42,7 @@ public class GameService {
         if (authDAO.getAuthData(authToken) == null) { throw new DataAccessException("Error: unauthorized"); }
         if (joinRequest.gameID() == null) { throw new DataAccessException("Error: bad request"); }
         String color = joinRequest.playerColor();
-        GameData game=gameDAO.getGame(joinRequest.gameID());
+        GameData game = gameDAO.getGame(joinRequest.gameID());
         if (game == null || color == null) {
             throw new DataAccessException("Error: bad request");
         }

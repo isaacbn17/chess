@@ -3,7 +3,6 @@ package dataaccess;
 import model.UserData;
 
 import java.sql.SQLException;
-
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLUserDAO implements UserDAO {

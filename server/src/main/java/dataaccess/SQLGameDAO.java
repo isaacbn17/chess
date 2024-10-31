@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -54,7 +53,7 @@ public class SQLGameDAO implements GameDAO {
         HashMap<Integer, GameData> games = new HashMap<>();
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(
-                    "SELECT ALL FROM game")) {
+                    "SELECT * FROM game")) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         GameData gameData = getGameData(rs);
@@ -81,7 +80,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement("SELECT ALL FROM game WHERE id=?")) {
+            try (var ps = conn.prepareStatement("SELECT * FROM game WHERE id=?")) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -103,7 +102,7 @@ public class SQLGameDAO implements GameDAO {
                     ps.setString(1, username);
                     ps.setInt(2, gameID);
                     ps.executeUpdate();
-                    getGame(gameID);
+                    return getGame(gameID);
                 }
             }
             else {
@@ -111,12 +110,11 @@ public class SQLGameDAO implements GameDAO {
                     ps.setString(1, username);
                     ps.setInt(2, gameID);
                     ps.executeUpdate();
-                    getGame(gameID);
+                    return getGame(gameID);
                 }
             }
         } catch (Exception ex) {
             throw new DataAccessException("Error: bad request");
         }
-        return null;
     }
 }
