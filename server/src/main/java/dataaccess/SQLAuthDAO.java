@@ -19,7 +19,7 @@ public class SQLAuthDAO implements AuthDAO {
             throw new DataAccessException(ex.getMessage());
         }
     }
-    public String generateToken() {
+    private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
