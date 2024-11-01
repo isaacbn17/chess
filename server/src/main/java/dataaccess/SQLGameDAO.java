@@ -40,12 +40,13 @@ public class SQLGameDAO implements GameDAO {
                 var ID = 0;
                 if (gameSet.next()) {
                     ID = gameSet.getInt(1);
+                    return new GameData(ID, null, null, gameName, game);
                 }
-                return new GameData(ID, null, null, gameName, game);
             }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage());
         }
+        return null;
     }
 
     @Override
