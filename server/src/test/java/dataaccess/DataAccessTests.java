@@ -99,10 +99,8 @@ public class DataAccessTests {
         assertEquals(0, countGameRows());
     }
     @Test void addGame() throws DataAccessException, SQLException {
-        userDAO.addUser(new UserData("a", "b", "c"));
         gameDAO.addGame("Gaaaame");
         assertEquals(1, countGameRows());
-        userDAO.clear();
         gameDAO.clear();
     }
     @Test void addGameFailure() {
