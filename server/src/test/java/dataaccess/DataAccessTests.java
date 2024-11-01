@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
+import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -98,8 +99,10 @@ public class DataAccessTests {
         assertEquals(0, countGameRows());
     }
     @Test void addGame() throws DataAccessException, SQLException {
+        userDAO.addUser(new UserData("a", "b", "c"));
         gameDAO.addGame("Gaaaame");
         assertEquals(1, countGameRows());
+        userDAO.clear();
         gameDAO.clear();
     }
     @Test void addGameFailure() {
