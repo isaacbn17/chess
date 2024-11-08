@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import exception.ResponseException;
 import model.*;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class ServerFacade {
         serverURL = url;
     }
 
-    public RegisterRequest createUser(UserData userData) throws IOException, URISyntaxException {
+    public RegisterRequest createUser(UserData userData) throws Exception {
         String path = "/user";
         return this.makeRequest("POST", path, userData, RegisterRequest.class);
     }
@@ -30,9 +31,8 @@ public class ServerFacade {
 //        return this.makeRequest("POST", path, joinRequest, LoginRequest.class);
 //    }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
-            throws IOException, URISyntaxException {
-        try {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
+//        try {
             URL url = (new URI(serverURL + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
@@ -42,9 +42,9 @@ public class ServerFacade {
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (IOException | URISyntaxException ex) {
-            throw ex;
-        }
+//        } catch (Exception ex) {
+//            throw ex;
+//        }
     }
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
@@ -55,10 +55,10 @@ public class ServerFacade {
             }
         }
     }
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws ResponseException, IOException {
         var status = http.getResponseCode();
-        if (status / 100 != 2) {
-            throw new IOException();
+        if (status == 403) {
+            throw new ResponseException("Error: username already taken.");
         }
     }
 

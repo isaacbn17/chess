@@ -18,7 +18,7 @@ public class ChessClient {
         server = new ServerFacade(serverURL);
     }
 
-    public String eval(String input) {
+    public String eval(String input) throws Exception {
         try {
             String[] tokens = input.toLowerCase().split(" ");
             String command = (tokens.length > 0) ? tokens[0] : "help";
@@ -28,18 +28,18 @@ public class ChessClient {
                 default -> help();
             };
         } catch (Exception ex) {
-            return ex.getMessage();
+            throw ex;
         }
     }
 
-    public String registerUser(String... params) throws ResponseException {
+    public String registerUser(String... params) throws Exception {
         if (params.length == 3) {
             UserData userData = new UserData(params[0], params[1], params[2]);
-            RegisterRequest registerResult = new RegisterRequest("hello", "token");
-            registerResult = server.createUser(userData);
-            return String.format("You signed in: %s", registerResult.toString());
+            RegisterRequest registerResult = server.createUser(userData);
+            state = State.SIGNEDIN;
+            return String.format("You're signed in as: %s", registerResult.username());
         }
-        throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
+        throw new ResponseException("Expected: <USERNAME> <PASSWORD> <EMAIL>");
     }
 
     public String help() {

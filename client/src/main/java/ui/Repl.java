@@ -17,8 +17,8 @@ public class Repl {
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("quit")) {
-            printPrompt();
+        while (! "quit".equals(result)) {
+            System.out.print("\n" +  ">>> ");
             String line = scanner.nextLine();
 
             try {
@@ -32,7 +32,4 @@ public class Repl {
         System.out.println();
     }
 
-    private void printPrompt() {
-        System.out.print("\n" +  ">>> ");
-    }
 }

@@ -1,9 +1,14 @@
 package exception;
 
 public class ResponseException extends Exception {
-    final private int statusCode;
-    public ResponseException(int statusCode, String message) {
+    @Override
+    public String toString() {
+        return message;
+    }
+
+    final private String message;
+    public ResponseException(String message) {
         super(message);
-        this.statusCode = statusCode;
+        this.message = message;
     }
 }
