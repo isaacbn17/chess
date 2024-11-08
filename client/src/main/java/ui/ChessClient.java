@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.Arrays;
 import server.ServerFacade;
 
 public class ChessClient {
@@ -9,6 +10,27 @@ public class ChessClient {
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
+    }
+
+    public String eval(String input) {
+        try {
+            String[] tokens = input.toLowerCase().split(" ");
+            String command = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (command) {
+                case "register" -> registerUser(params);
+                default -> help();
+            };
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String registerUser(String... params) throws Exception {
+        if (params.length > 1) {
+
+        }
+        return "";
     }
 
     public String help() {
