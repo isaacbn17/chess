@@ -112,7 +112,6 @@ public class Server {
         res.status(200);
         return new Gson().toJson(authenticatedUser);
     }
-
     private String createUser(Request req, Response res) throws DataAccessException {
         try {
             UserData newUser = new Gson().fromJson(req.body(), UserData.class);
@@ -125,7 +124,6 @@ public class Server {
             return "";
         }
     }
-
     private String deleteEverything(Request req, Response res) throws DataAccessException {
         delete.clearUsers();
         delete.clearGames();

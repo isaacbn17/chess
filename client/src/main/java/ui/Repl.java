@@ -23,11 +23,16 @@ public class Repl {
 
             try {
                 result = client.eval(line);
+                System.out.print(SET_TEXT_COLOR_GREEN + result);
+            } catch (Throwable ex) {
+                String message = ex.toString();
+                System.out.print(message);
             }
         }
+        System.out.println();
     }
 
     private void printPrompt() {
-        System.out.print("\n" +  ">>>" + SET_TEXT_COLOR_BLUE);
+        System.out.print("\n" +  ">>> ");
     }
 }

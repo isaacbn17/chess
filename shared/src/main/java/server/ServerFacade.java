@@ -20,15 +20,15 @@ public class ServerFacade {
         serverURL = url;
     }
 
-    public String createUser(JoinRequest joinRequest) {
+    public RegisterRequest createUser(UserData userData) throws IOException, URISyntaxException {
         String path = "/user";
-        return this.makeRequest("POST", path, joinRequest, RegisterRequest.class);
+        return this.makeRequest("POST", path, userData, RegisterRequest.class);
     }
 
-    public String loginUser(JoinRequest joinRequest) throws IOException, URISyntaxException {
-        String path = "/session";
-        return this.makeRequest("POST", path, joinRequest, LoginRequest.class);
-    }
+//    public String loginUser(JoinRequest joinRequest) throws IOException, URISyntaxException {
+//        String path = "/session";
+//        return this.makeRequest("POST", path, joinRequest, LoginRequest.class);
+//    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
             throws IOException, URISyntaxException {
@@ -55,7 +55,6 @@ public class ServerFacade {
             }
         }
     }
-
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException {
         var status = http.getResponseCode();
         if (status / 100 != 2) {

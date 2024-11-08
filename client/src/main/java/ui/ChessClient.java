@@ -1,6 +1,12 @@
 package ui;
 
 import java.util.Arrays;
+
+import exception.ResponseException;
+import model.AuthData;
+import model.LoginRequest;
+import model.RegisterRequest;
+import model.UserData;
 import server.ServerFacade;
 
 public class ChessClient {
@@ -26,11 +32,14 @@ public class ChessClient {
         }
     }
 
-    public String registerUser(String... params) throws Exception {
-        if (params.length > 1) {
-
+    public String registerUser(String... params) throws ResponseException {
+        if (params.length == 3) {
+            UserData userData = new UserData(params[0], params[1], params[2]);
+            RegisterRequest registerResult = new RegisterRequest("hello", "token");
+            registerResult = server.createUser(userData);
+            return String.format("You signed in: %s", registerResult.toString());
         }
-        return "";
+        throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
     }
 
     public String help() {
