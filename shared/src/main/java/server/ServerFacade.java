@@ -24,10 +24,13 @@ public class ServerFacade {
         String path = "/user";
         return this.makeRequest("POST", path, userData, RegisterResult.class);
     }
-
     public RegisterResult loginUser(LoginRequest loginRequest) throws Exception {
         String path = "/session";
         return this.makeRequest("POST", path, loginRequest, RegisterResult.class);
+    }
+    public GameID createGame(GameName gameName) throws Exception {
+        String path = "/game";
+        return this.makeRequest("POST", path, gameName, GameID.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {

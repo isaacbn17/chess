@@ -3,9 +3,7 @@ package ui;
 import java.util.Arrays;
 
 import exception.ResponseException;
-import model.LoginRequest;
-import model.RegisterResult;
-import model.UserData;
+import model.*;
 import server.ServerFacade;
 
 public class ChessClient {
@@ -25,10 +23,23 @@ public class ChessClient {
             case "quit" -> "quit";
             case "register" -> registerUser(params);
             case "login" -> loginUser(params);
+            case "logout" -> logoutUser();
+            case "create" -> createGame(params);
+            case "list" -> listGames();
+            case "join" -> joinGame(params);
+            case "observe" -> observeGame(params);
             default -> help();
         };
     }
-
+    public String registerUser(String... params) throws Exception {
+        if (params.length == 3) {
+            UserData userData = new UserData(params[0], params[1], params[2]);
+            RegisterResult registerResult = server.createUser(userData);
+            state = State.SIGNEDIN;
+            return String.format("You're signed in as: %s", registerResult.username());
+        }
+        throw new ResponseException("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");
+    }
     private String loginUser(String[] params) throws Exception {
         if (params.length == 2) {
             LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
@@ -39,15 +50,23 @@ public class ChessClient {
         throw new ResponseException("Error: Expected <USERNAME> <PASSWORD");
     }
 
-    public String registerUser(String... params) throws Exception {
-        if (params.length == 3) {
-            UserData userData = new UserData(params[0], params[1], params[2]);
-            RegisterResult registerResult = server.createUser(userData);
-            state = State.SIGNEDIN;
-            return String.format("You're signed in as: %s", registerResult.username());
+    private String logoutUser() throws ResponseException {
+        if (state == State.SIGNEDOUT) {
+            throw new ResponseException("You must sign in.");
         }
-        throw new ResponseException("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");
+        state = State.SIGNEDOUT;
+        return "You've logged out.";
     }
+
+    private String createGame(String[] params) throws Exception {
+        if (params.length == 1) {
+            GameName gameName = new GameName(params[0]);
+            GameID gameID = server.createGame(gameName);
+            return String.format("You've created a game. Game ID: %d", gameID.gameID());
+        }
+        throw new ResponseException("Error: Expected: <GAME NAME>");
+    }
+
 
     public String help() {
         if (state == State.SIGNEDOUT) {

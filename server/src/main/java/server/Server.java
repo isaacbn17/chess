@@ -88,7 +88,7 @@ public class Server {
         GameName gameNameObj = new Gson().fromJson(req.body(), GameName.class);
         GameData game = gameService.createGame(authToken, gameNameObj.gameName());
         res.status(200);
-        GameCreateResult newGame = new GameCreateResult(game.gameID());
+        GameID newGame = new GameID(game.gameID());
 
         return new Gson().toJson(newGame);
     }
