@@ -18,14 +18,14 @@ class ServiceTest {
 
     @Test
     public void joinGameBadRequest() throws DataAccessException {
-        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
         GameData game = gameService.createGame(registerResult.authToken(), "game1");
         JoinRequest joinRequest = new JoinRequest("WHITE", game.gameID());
         assertThrows(DataAccessException.class, () -> gameService.joinGame("hello", joinRequest));
     }
     @Test
     public void joinGame() throws DataAccessException {
-        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
         GameData game = gameService.createGame(registerResult.authToken(), "game1");
         JoinRequest joinRequest = new JoinRequest("WHITE", game.gameID());
         game = gameService.joinGame(registerResult.authToken(), joinRequest);
@@ -37,7 +37,7 @@ class ServiceTest {
     }
     @Test
     public void createGame() throws DataAccessException {
-        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
         GameData game = gameService.createGame(registerResult.authToken(), "game1");
         int gameID = game.gameID();
         ChessGame chessGame = game.game();
@@ -46,7 +46,7 @@ class ServiceTest {
     }
     @Test
     public void listGames() throws DataAccessException {
-        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
         GameData game1 = gameService.createGame(registerResult.authToken(), "game1");
         ArrayList<GameSimplified> games = gameService.listGames(registerResult.authToken());
         ListGameResult returnVal = new ListGameResult(games);
@@ -60,7 +60,7 @@ class ServiceTest {
     }
     @Test
     public void logoutUser() throws DataAccessException {
-        RegisterRequest registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registerResult = userService.registerUser(new UserData("a", "b", "c.com"));
 
         userService.logoutUser(registerResult.authToken());
         assertNull(authDAO.getAuthData(registerResult.authToken()));
@@ -71,7 +71,7 @@ class ServiceTest {
     }
     @Test
     public void loginUser() throws DataAccessException {
-        RegisterRequest registered = userService.registerUser(new UserData("a", "b", "c.com"));
+        RegisterResult registered = userService.registerUser(new UserData("a", "b", "c.com"));
         userService.logoutUser(registered.authToken());
 
         LoginRequest loginRequest = new LoginRequest("a", "b");

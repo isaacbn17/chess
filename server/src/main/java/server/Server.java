@@ -41,12 +41,12 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::createUser);
-        Spark.delete("/db", this::deleteEverything);
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
         Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGames);
         Spark.put("/game", this::joinGame);
+        Spark.delete("/db", this::deleteEverything);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -108,7 +108,7 @@ public class Server {
     private String loginUser(Request req, Response res) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
 
-        RegisterRequest authenticatedUser = userService.loginUser(loginRequest);
+        RegisterResult authenticatedUser = userService.loginUser(loginRequest);
         res.status(200);
         return new Gson().toJson(authenticatedUser);
     }
@@ -116,7 +116,7 @@ public class Server {
         try {
             UserData newUser = new Gson().fromJson(req.body(), UserData.class);
 
-            RegisterRequest registeredUser = userService.registerUser(newUser);
+            RegisterResult registeredUser = userService.registerUser(newUser);
             res.status(200);
             return new Gson().toJson(registeredUser);
         } catch (JsonSyntaxException ex) {

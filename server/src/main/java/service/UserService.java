@@ -5,7 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.LoginRequest;
-import model.RegisterRequest;
+import model.RegisterResult;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -23,7 +23,7 @@ public class UserService {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public RegisterRequest registerUser(UserData newUser) throws DataAccessException {
+    public RegisterResult registerUser(UserData newUser) throws DataAccessException {
         if (newUser.username() == null || newUser.password() == null || newUser.email() == null ||
                 newUser.username().isEmpty() || newUser.password().isEmpty() || newUser.email().isEmpty()) {
             throw new DataAccessException("Error: bad request");
@@ -34,10 +34,10 @@ public class UserService {
         String hashedPassword = hashPassword(newUser.password());
         userDAO.addUser(new UserData(newUser.username(), hashedPassword, newUser.email()));
         AuthData authData = authDAO.addAuthData(newUser.username());
-        return new RegisterRequest(newUser.username(), authData.authToken());
+        return new RegisterResult(newUser.username(), authData.authToken());
     }
 
-    public RegisterRequest loginUser(LoginRequest loginRequest) throws DataAccessException {
+    public RegisterResult loginUser(LoginRequest loginRequest) throws DataAccessException {
         String username = loginRequest.username();
         String password = loginRequest.password();
         if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
@@ -49,7 +49,7 @@ public class UserService {
 
         AuthData authData = authDAO.addAuthData(username);
 
-        return new RegisterRequest(username, authData.authToken());
+        return new RegisterResult(username, authData.authToken());
     }
 
     public void logoutUser(String authToken) throws DataAccessException {

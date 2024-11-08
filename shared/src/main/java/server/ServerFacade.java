@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 
@@ -21,30 +20,26 @@ public class ServerFacade {
         serverURL = url;
     }
 
-    public RegisterRequest createUser(UserData userData) throws Exception {
+    public RegisterResult createUser(UserData userData) throws Exception {
         String path = "/user";
-        return this.makeRequest("POST", path, userData, RegisterRequest.class);
+        return this.makeRequest("POST", path, userData, RegisterResult.class);
     }
 
-//    public String loginUser(JoinRequest joinRequest) throws IOException, URISyntaxException {
-//        String path = "/session";
-//        return this.makeRequest("POST", path, joinRequest, LoginRequest.class);
-//    }
+    public RegisterResult loginUser(LoginRequest loginRequest) throws Exception {
+        String path = "/session";
+        return this.makeRequest("POST", path, loginRequest, RegisterResult.class);
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
-//        try {
-            URL url = (new URI(serverURL + path)).toURL();
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            http.setRequestMethod(method);
-            http.setDoOutput(true);
+        URL url = (new URI(serverURL + path)).toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod(method);
+        http.setDoOutput(true);
 
-            writeBody(request, http);
-            http.connect();
-            throwIfNotSuccessful(http);
-            return readBody(http, responseClass);
-//        } catch (Exception ex) {
-//            throw ex;
-//        }
+        writeBody(request, http);
+        http.connect();
+        throwIfNotSuccessful(http);
+        return readBody(http, responseClass);
     }
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
@@ -57,11 +52,13 @@ public class ServerFacade {
     }
     private void throwIfNotSuccessful(HttpURLConnection http) throws ResponseException, IOException {
         var status = http.getResponseCode();
-        if (status == 403) {
-            throw new ResponseException("Error: username already taken.");
+        switch (status) {
+            case 401 -> throw new ResponseException("Error: unauthorized.");
+            case 403 -> throw new ResponseException("Error: username already taken.");
+            case 400 -> throw new ResponseException("Error: bad request.");
+            case 500 -> throw new ResponseException("Error");
         }
     }
-
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
         if (http.getContentLength() < 0) {
