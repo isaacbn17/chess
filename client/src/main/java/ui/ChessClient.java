@@ -28,7 +28,7 @@ public class ChessClient {
             case "logout" -> logoutUser();
             case "create" -> createGame(params);
             case "list" -> listGames();
-//            case "join" -> joinGame(params);
+            case "join" -> joinGame(params);
 //            case "observe" -> observeGame(params);
             default -> help();
         };
@@ -44,7 +44,7 @@ public class ChessClient {
         }
         throw new ResponseException("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");
     }
-    private String loginUser(String[] params) throws Exception {
+    private String loginUser(String... params) throws Exception {
         if (params.length == 2) {
             LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
             RegisterResult loginResult = server.loginUser(loginRequest);
@@ -62,7 +62,7 @@ public class ChessClient {
         state = State.SIGNEDOUT;
         return "You've logged out.";
     }
-    private String createGame(String[] params) throws Exception {
+    private String createGame(String... params) throws Exception {
         if (params.length == 1) {
             GameName gameName = new GameName(params[0]);
             GameID gameID = server.createGame(gameName, authToken);
@@ -83,9 +83,16 @@ public class ChessClient {
                     .append("\nBlack Username: ")
                     .append(game.blackUsername())
                     .append("\n\n");
-
         }
         return gamesString.toString();
+    }
+    private String joinGame(String... params) throws Exception {
+        if (params.length == 2) {
+            JoinRequest joinRequest = new JoinRequest(params[1], Integer.parseInt(params[0]));
+            server.joinGame(joinRequest, authToken);
+            return "Joined successfully.";
+        }
+        throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
     }
 
 

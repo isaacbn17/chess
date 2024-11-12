@@ -37,6 +37,9 @@ public class ServerFacade {
     public ArrayList<GameSimplified> listGames(String authToken) throws Exception {
         return this.makeRequest("GET", "/game", null, ListGameResult.class, authToken).games();
     }
+    public void joinGame(JoinRequest joinRequest, String authToken) throws Exception {
+        this.makeRequest("PUT", "/game", joinRequest, null, authToken);
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws Exception {
         URL url = (new URI(serverURL + path)).toURL();
@@ -65,7 +68,7 @@ public class ServerFacade {
         var status = http.getResponseCode();
         switch (status) {
             case 401 -> throw new ResponseException("Error: unauthorized.");
-            case 403 -> throw new ResponseException("Error: username already taken.");
+            case 403 -> throw new ResponseException("Error: already taken.");
             case 400 -> throw new ResponseException("Error: bad request.");
             case 500 -> throw new ResponseException("Error");
         }
@@ -82,6 +85,5 @@ public class ServerFacade {
         }
         return response;
     }
-
 
 }
