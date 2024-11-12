@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.*;
 import model.*;
-import service.Delete;
+import service.DeleteService;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -17,7 +17,7 @@ public class Server {
     private AuthDAO authDAO = new MemoryAuthDAO();
 
     private final UserService userService;
-    private final Delete delete;
+    private final DeleteService delete;
     private final GameService gameService;
 
     public Server() {
@@ -29,7 +29,7 @@ public class Server {
             System.out.println(ex);
         }
         this.userService = new UserService(userDAO, authDAO);
-        this.delete = new Delete(userDAO, gameDAO, authDAO);
+        this.delete = new DeleteService(userDAO, gameDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
