@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import exception.ResponseException;
@@ -10,6 +11,7 @@ public class ChessClient {
 
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private String authToken = "";
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -26,15 +28,17 @@ public class ChessClient {
             case "logout" -> logoutUser();
             case "create" -> createGame(params);
             case "list" -> listGames();
-            case "join" -> joinGame(params);
-            case "observe" -> observeGame(params);
+//            case "join" -> joinGame(params);
+//            case "observe" -> observeGame(params);
             default -> help();
         };
     }
+
     public String registerUser(String... params) throws Exception {
         if (params.length == 3) {
             UserData userData = new UserData(params[0], params[1], params[2]);
             RegisterResult registerResult = server.createUser(userData);
+            authToken = registerResult.authToken();
             state = State.SIGNEDIN;
             return String.format("You're signed in as: %s", registerResult.username());
         }
@@ -44,27 +48,44 @@ public class ChessClient {
         if (params.length == 2) {
             LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
             RegisterResult loginResult = server.loginUser(loginRequest);
+            authToken = loginResult.authToken();
             state = State.SIGNEDIN;
             return String.format("You're signed in as: %s", loginResult.username());
         }
-        throw new ResponseException("Error: Expected <USERNAME> <PASSWORD");
+        throw new ResponseException("Error: Expected <USERNAME> <PASSWORD>");
     }
-
-    private String logoutUser() throws ResponseException {
+    private String logoutUser() throws Exception {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException("You must sign in.");
         }
+        server.logoutUser(authToken);
         state = State.SIGNEDOUT;
         return "You've logged out.";
     }
-
     private String createGame(String[] params) throws Exception {
         if (params.length == 1) {
             GameName gameName = new GameName(params[0]);
-            GameID gameID = server.createGame(gameName);
+            GameID gameID = server.createGame(gameName, authToken);
             return String.format("You've created a game. Game ID: %d", gameID.gameID());
         }
         throw new ResponseException("Error: Expected: <GAME NAME>");
+    }
+    private String listGames() throws Exception {
+        ArrayList<GameSimplified> games = server.listGames(authToken);
+        StringBuilder gamesString =new StringBuilder();
+        for (GameSimplified game : games) {
+            gamesString.append("Game Name: ")
+                    .append(game.gameName())
+                    .append("\nGame ID: ")
+                    .append(game.gameID())
+                    .append("\nWhite Username: ")
+                    .append(game.whiteUsername())
+                    .append("\nBlack Username: ")
+                    .append(game.blackUsername())
+                    .append("\n\n");
+
+        }
+        return gamesString.toString();
     }
 
 

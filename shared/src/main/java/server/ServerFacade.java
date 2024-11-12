@@ -10,7 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class ServerFacade {
@@ -21,23 +23,29 @@ public class ServerFacade {
     }
 
     public RegisterResult createUser(UserData userData) throws Exception {
-        String path = "/user";
-        return this.makeRequest("POST", path, userData, RegisterResult.class);
+        return this.makeRequest("POST", "/user", userData, RegisterResult.class, null);
     }
     public RegisterResult loginUser(LoginRequest loginRequest) throws Exception {
-        String path = "/session";
-        return this.makeRequest("POST", path, loginRequest, RegisterResult.class);
+        return this.makeRequest("POST",  "/session", loginRequest, RegisterResult.class, null);
     }
-    public GameID createGame(GameName gameName) throws Exception {
-        String path = "/game";
-        return this.makeRequest("POST", path, gameName, GameID.class);
+    public void logoutUser(String authToken) throws Exception {
+        this.makeRequest("DELETE", "/session", null, null, authToken);
+    }
+    public GameID createGame(GameName gameName, String authToken) throws Exception {
+        return this.makeRequest("POST", "/game", gameName, GameID.class, authToken);
+    }
+    public ArrayList<GameSimplified> listGames(String authToken) throws Exception {
+        return this.makeRequest("GET", "/game", null, ListGameResult.class, authToken).games();
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws Exception {
         URL url = (new URI(serverURL + path)).toURL();
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod(method);
         http.setDoOutput(true);
+        if (authToken != null) {
+            http.setRequestProperty("authorization", authToken);
+        }
 
         writeBody(request, http);
         http.connect();
@@ -74,5 +82,6 @@ public class ServerFacade {
         }
         return response;
     }
+
 
 }
