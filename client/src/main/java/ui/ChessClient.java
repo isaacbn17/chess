@@ -2,6 +2,7 @@ package ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import exception.ResponseException;
 import model.*;
@@ -12,6 +13,7 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
+    private final HashMap<Integer, Integer> gameNumberAndIDs = new HashMap<>();
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -29,7 +31,7 @@ public class ChessClient {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
-//            case "observe" -> observeGame(params);
+            case "observe" -> observeGame(params);
             default -> help();
         };
     }
@@ -73,26 +75,35 @@ public class ChessClient {
     private String listGames() throws Exception {
         ArrayList<GameSimplified> games = server.listGames(authToken);
         StringBuilder gamesString =new StringBuilder();
+        int i = 1;
         for (GameSimplified game : games) {
-            gamesString.append("Game Name: ")
+            gamesString.append(i).append(")")
+                    .append("\nGame Name: ")
                     .append(game.gameName())
-                    .append("\nGame ID: ")
-                    .append(game.gameID())
                     .append("\nWhite Username: ")
                     .append(game.whiteUsername())
                     .append("\nBlack Username: ")
                     .append(game.blackUsername())
                     .append("\n\n");
+            gameNumberAndIDs.put(i, game.gameID());
+            i++;
         }
         return gamesString.toString();
     }
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
-            JoinRequest joinRequest = new JoinRequest(params[1], Integer.parseInt(params[0]));
+            int gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
+            JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
             return "Joined successfully.";
         }
         throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
+    }
+    private String observeGame(String... params) throws Exception {
+        if (params.length == 1) {
+            return "";
+        }
+        throw new ResponseException("Error: Expected <ID>");
     }
 
 
