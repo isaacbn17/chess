@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import static ui.EscapeSequences.*;
 
 public class PrintBoard {
-    private static final String[] letters = {" a", " b", " c", " d", " e", " f", " g", " h"};
+    private static final String[] LETTERS = {" a", " b", " c", " d", " e", " f", " g", " h"};
     public static void main(String[] args) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
@@ -23,8 +23,6 @@ public class PrintBoard {
         }
         drawTopOrBottomRow(out, false);
     }
-
-
 
     private static void drawWhitePerspective(PrintStream out) {
         drawTopOrBottomRow(out, true);
@@ -87,12 +85,12 @@ public class PrintBoard {
         out.print(SET_TEXT_COLOR_BLACK);
         if (colorWhite) {
             for (int boardCol = 0; boardCol < 8; boardCol++) {
-                out.print(letters[boardCol] + "\u3000");
+                out.print(LETTERS[boardCol] + "\u3000");
             }
         }
         else {
             for (int boardCol = 7; boardCol >= 0; boardCol--) {
-                out.print(letters[boardCol] + "\u3000");
+                out.print(LETTERS[boardCol] + "\u3000");
             }
         }
         out.print(EMPTY);
