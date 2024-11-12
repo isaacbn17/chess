@@ -95,13 +95,15 @@ public class ChessClient {
             int gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
+            PrintBoard.main(new String[] {""});
             return "Joined successfully.";
         }
         throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
     }
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
-            return "";
+            PrintBoard.main(new String[] {""});
+            return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");
     }
