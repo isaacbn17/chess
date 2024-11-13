@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 import exception.ResponseException;
 import model.*;
@@ -67,8 +68,8 @@ public class ChessClient {
     private String createGame(String... params) throws Exception {
         if (params.length == 1) {
             GameName gameName = new GameName(params[0]);
-            GameID gameID = server.createGame(gameName, authToken);
-            return String.format("You've created a game. Game ID: %d", gameID.gameID());
+            server.createGame(gameName, authToken);
+            return "You've created a game.";
         }
         throw new ResponseException("Error: Expected: <GAME NAME>");
     }
@@ -95,14 +96,19 @@ public class ChessClient {
             int gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
-            PrintBoard.main(new String[] {""});
+            if (Objects.equals(joinRequest.playerColor(), "black")) {
+                PrintBoard.drawBlackPerspective();
+            }
+            else {
+                PrintBoard.drawWhitePerspective();
+            }
             return "Joined successfully.";
         }
         throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
     }
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
-            PrintBoard.main(new String[] {""});
+            PrintBoard.drawWhitePerspective();
             return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");
