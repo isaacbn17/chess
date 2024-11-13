@@ -8,12 +8,9 @@ public class PrintBoard {
     private static final String[] LETTERS={" a", " b", " c", " d", " e", " f", " g", " h"};
 
     public static void main(String[] args) {
-//        PrintStream out=new PrintStream(System.out, true, StandardCharsets.UTF_8);
-//        out.print(ERASE_SCREEN);
-//        out.print("White perspective:\n");
+        System.out.println("White perspective:\n");
         drawWhitePerspective();
-//        out.print(SET_TEXT_COLOR_WHITE);
-//        out.print("Black perspective:\n");
+        System.out.println("Black perspective:\n");
         drawBlackPerspective();
     }
 

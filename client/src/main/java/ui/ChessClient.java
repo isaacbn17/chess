@@ -93,7 +93,12 @@ public class ChessClient {
     }
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
-            int gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
+            int gameID;
+            try {
+                gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
+            } catch (Exception ex) {
+                return "Error: incorrect parameter";
+            }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
@@ -113,7 +118,6 @@ public class ChessClient {
         }
         throw new ResponseException("Error: Expected <ID>");
     }
-
 
     public String help() {
         if (state == State.SIGNEDOUT) {
