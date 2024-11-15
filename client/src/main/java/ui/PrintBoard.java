@@ -2,6 +2,8 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -14,16 +16,19 @@ public class PrintBoard {
         ChessGame game = new ChessGame();
         System.out.println("White perspective:\n");
         drawWhitePerspective(game);
-        System.out.println("Black perspective:\n");
+        System.out.println(SET_TEXT_COLOR_WHITE + "Black perspective:\n");
         drawBlackPerspective(game);
     }
 
     public static void drawBlackPerspective(ChessGame game) {
+        ChessBoard board = game.getBoard();
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, false);
         for (int row=1; row <= 8; row++) {
-            drawChessRow(out, row, false);
+            for (int col=9; col>=0; col--) {
+                drawChessRow(out, board, row, col);
+            }
             out.print(RESET_BG_COLOR);
             out.print("\n");
         }
@@ -32,11 +37,14 @@ public class PrintBoard {
     }
 
     public static void drawWhitePerspective(ChessGame game) {
+        ChessBoard board = game.getBoard();
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, true);
-        for (int row=8; row > 0; row--) {
-            drawChessRow(out, row, true);
+        for (int row=8; row >=1; row--) {
+            for (int col=0; col<=9; col++) {
+                drawChessRow(out, board, row, col);
+            }
             out.print(RESET_BG_COLOR);
             out.print("\n");
         }
@@ -44,57 +52,45 @@ public class PrintBoard {
         out.print("\n");
     }
 
-    private static void drawChessRow(PrintStream out, int row, boolean whitePerspective) {
-        for (int col=0; col < 10; col++) {
-            if (col == 0 || col == 9) {
-                out.print(SET_BG_COLOR_LIGHT_GREY);
-                out.print(SET_TEXT_COLOR_BLACK);
-                out.printf(" %s\u3000", row);
-            }
-            boolean isWhiteSquare=whitePerspective ? (col + row) % 2 == 1 : (col + row) % 2 == 0;
-            out.print(isWhiteSquare ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+    private static void drawChessRow(PrintStream out, ChessBoard board, int row, int col) {
+        if (col == 0 || col == 9) {
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+            out.print(SET_TEXT_COLOR_BLACK);
+            out.printf(" %s\u3000", row);
+        }
+        boolean isWhiteSquare = (col + row) % 2 == 1;
+        out.print(isWhiteSquare ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
 
-            if (col > 0 && col < 9) {
-                if (row == 8) {
-                    printBackRow(out, col, SET_TEXT_COLOR_MAGENTA, BLACK_ROOK,
-                            BLACK_KNIGHT, BLACK_BISHOP);
-                    printKingsAndQueens(out, col, whitePerspective, BLACK_QUEEN, WHITE_KING, BLACK_KING, WHITE_QUEEN);
-
-                } else if (row == 7) {
-                    out.print(SET_TEXT_COLOR_MAGENTA);
-                    out.print(BLACK_PAWN);
-                } else if (row == 2) {
-                    out.print(SET_TEXT_COLOR_BLUE);
-                    out.print(WHITE_PAWN);
-                } else if (row == 1) {
-                    printBackRow(out, col, SET_TEXT_COLOR_BLUE, WHITE_ROOK,
-                            WHITE_KNIGHT, WHITE_BISHOP);
-                    printKingsAndQueens(out, col, whitePerspective, WHITE_QUEEN, BLACK_KING, WHITE_KING, BLACK_QUEEN);
-
-                } else {
-                    out.print(EMPTY);
-                }
+        if (col > 0 && col < 9) {
+            ChessPiece piece=board.getPiece(new ChessPosition(row, col));
+            if (piece == null) {
+                out.print(EMPTY);
+            } else {
+                drawPiece(out, piece);
             }
         }
     }
 
-    private static void printKingsAndQueens(PrintStream out, int col, boolean whitePerspective,
-                                            String queen1, String king1, String king2, String queen2) {
-        if (col == 4 && whitePerspective) { out.print(queen1); }
-        else if (col == 4) { out.print(king1); }
-        else if (col == 5 && whitePerspective) { out.print(king2); }
-        else if (col == 5) { out.print(queen2); }
-    }
+    private static void drawPiece(PrintStream out, ChessPiece piece) {
+        ChessGame.TeamColor pieceColor=piece.getTeamColor();
+        out.print(pieceColor == ChessGame.TeamColor.WHITE ? SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_MAGENTA);
 
-    private static void printBackRow(PrintStream out, int col, String textColor,
-                                     String rook, String knight, String bishop) {
-        out.print(textColor);
-        switch (col) {
-            case (1), (8) -> out.print(rook);
-            case (2), (7) -> out.print(knight);
-            case (3), (6) -> out.print(bishop);
+        ChessPiece.PieceType type=piece.getPieceType();
+        if (type == ChessPiece.PieceType.PAWN) {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN);
+        } else if (type == ChessPiece.PieceType.ROOK) {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK);
+        } else if (type == ChessPiece.PieceType.KNIGHT) {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+        } else if (type == ChessPiece.PieceType.BISHOP) {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP);
+        } else if (type == ChessPiece.PieceType.QUEEN) {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN);
+        } else {
+            out.print(pieceColor == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING);
         }
     }
+
 
     private static void drawTopOrBottomRow(PrintStream out, boolean colorWhite) {
         out.print(SET_BG_COLOR_LIGHT_GREY);

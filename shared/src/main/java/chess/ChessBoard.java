@@ -31,7 +31,6 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
-
     public void resetBoard() {
         addPawns();
         addRooks();
