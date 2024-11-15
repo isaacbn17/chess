@@ -33,7 +33,6 @@ public class Server {
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
-
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 

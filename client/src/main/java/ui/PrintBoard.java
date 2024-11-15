@@ -1,5 +1,8 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import static ui.EscapeSequences.*;
@@ -8,13 +11,14 @@ public class PrintBoard {
     private static final String[] LETTERS={" a", " b", " c", " d", " e", " f", " g", " h"};
 
     public static void main(String[] args) {
+        ChessGame game = new ChessGame();
         System.out.println("White perspective:\n");
-        drawWhitePerspective();
+        drawWhitePerspective(game);
         System.out.println("Black perspective:\n");
-        drawBlackPerspective();
+        drawBlackPerspective(game);
     }
 
-    public static void drawBlackPerspective() {
+    public static void drawBlackPerspective(ChessGame game) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, false);
@@ -27,7 +31,7 @@ public class PrintBoard {
         out.print("\n");
     }
 
-    public static void drawWhitePerspective() {
+    public static void drawWhitePerspective(ChessGame game) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, true);

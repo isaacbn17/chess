@@ -2,15 +2,12 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+
 
 public class MemoryGameDAO implements GameDAO {
-    private HashMap<Integer, GameData> games = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
     Integer gameID = 1000;
-
 
     @Override
     public void clear() {
@@ -37,18 +34,16 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public GameData updateGames(int gameID, String color, String username) {
+        GameData game = games.get(gameID);
+        GameData newGame;
         if (color.equalsIgnoreCase("WHITE")) {
-            GameData game = games.get(gameID);
-            GameData newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
-            games.put(gameID, newGame);
-            return games.get(gameID);
+            newGame=new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         }
         else {
-            GameData game = games.get(gameID);
-            GameData newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
-            games.put(gameID, newGame);
-            return games.get(gameID);
+            newGame=new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
+        games.put(gameID, newGame);
+        return games.get(gameID);
     }
 
 }

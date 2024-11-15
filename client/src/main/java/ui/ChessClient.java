@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
@@ -14,7 +15,8 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
-    private final HashMap<Integer, Integer> gameNumberAndIDs = new HashMap<>();
+    private final HashMap<Integer, Integer> gameIDtoNumber = new HashMap<>();
+    private final HashMap<Integer, ChessGame> games = new HashMap<>();
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -68,26 +70,27 @@ public class ChessClient {
     private String createGame(String... params) throws Exception {
         if (params.length == 1) {
             GameName gameName = new GameName(params[0]);
-            server.createGame(gameName, authToken);
+            int gameID = Integer.parseInt(server.createGame(gameName, authToken).toString());
+//            gameIDtoNumber.put(gameID, gameIDtoNumber.size()+1);
+            games.put(gameID, new ChessGame());
             return "You've created a game.";
         }
         throw new ResponseException("Error: Expected: <GAME NAME>");
     }
     private String listGames() throws Exception {
         ArrayList<GameSimplified> games = server.listGames(authToken);
-        StringBuilder gamesString =new StringBuilder();
+        StringBuilder gamesString = new StringBuilder();
         int i = 1;
         for (GameSimplified game : games) {
-            gamesString.append(i).append(")")
-                    .append("\nGame Name: ")
+            gamesString.append(i).append(")\n")
+                    .append("Game Name: ")
                     .append(game.gameName())
                     .append("\nWhite Username: ")
                     .append(game.whiteUsername())
                     .append("\nBlack Username: ")
                     .append(game.blackUsername())
                     .append("\n\n");
-            gameNumberAndIDs.put(i, game.gameID());
-            i++;
+            gameIDtoNumber.put(game.gameID(), i);
         }
         return gamesString.toString();
     }
@@ -95,17 +98,18 @@ public class ChessClient {
         if (params.length == 2) {
             int gameID;
             try {
-                gameID = gameNumberAndIDs.get(Integer.parseInt(params[0]));
+                gameID = gameIDtoNumber.get(Integer.parseInt(params[0]));
             } catch (Exception ex) {
                 return "Error: incorrect parameter";
             }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
+            ChessGame game = games.get(gameID);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
-                PrintBoard.drawBlackPerspective();
+                PrintBoard.drawBlackPerspective(game);
             }
             else {
-                PrintBoard.drawWhitePerspective();
+                PrintBoard.drawWhitePerspective(game);
             }
             return "Joined successfully.";
         }
@@ -113,7 +117,13 @@ public class ChessClient {
     }
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
-            PrintBoard.drawWhitePerspective();
+            int gameID;
+            try {
+                gameID = gameIDtoNumber.get(Integer.parseInt(params[0]));
+            } catch (Exception ex) {
+                return "Error: incorrect parameter";
+            }
+            PrintBoard.drawWhitePerspective(games.get(gameID));
             return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");

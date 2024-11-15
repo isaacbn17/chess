@@ -1,9 +1,6 @@
 package dataaccess;
 
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

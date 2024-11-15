@@ -18,7 +18,7 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (! "quit".equals(result)) {
-            System.out.print("\n" +  ">>> ");
+            System.out.print(SET_TEXT_COLOR_WHITE + "\n" +  ">>> ");
             String line = scanner.nextLine();
 
             try {
