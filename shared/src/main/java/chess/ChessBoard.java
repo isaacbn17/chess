@@ -18,7 +18,7 @@ public class ChessBoard {
         return Arrays.deepEquals(squares, that.squares);
     }
     public int hashCode() {
-        return 17*Arrays.hashCode(squares);
+        return 17* Arrays.deepHashCode(squares);
     }
 
     public void addPiece(ChessPosition position, ChessPiece piece) {

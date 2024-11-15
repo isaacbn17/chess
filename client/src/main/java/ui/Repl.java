@@ -1,7 +1,5 @@
 package ui;
 
-import ui.ChessClient;
-
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 

@@ -91,7 +91,6 @@ public class PrintBoard {
         }
     }
 
-
     private static void drawTopOrBottomRow(PrintStream out, boolean colorWhite) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(EMPTY);
