@@ -1,13 +1,14 @@
-package ui;
+package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import static ui.EscapeSequences.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+
+import static client.EscapeSequences.*;
 
 public class PrintBoard {
     private static final String[] LETTERS={" a", " b", " c", " d", " e", " f", " g", " h"};
@@ -15,19 +16,19 @@ public class PrintBoard {
     public static void main(String[] args) {
         ChessGame game = new ChessGame();
         System.out.println("White perspective:\n");
-        drawWhitePerspective(game);
+        drawWhitePerspective(game, new ChessPosition(2, 2));
         System.out.println(SET_TEXT_COLOR_WHITE + "Black perspective:\n");
-        drawBlackPerspective(game);
+        drawBlackPerspective(game, null);
     }
 
-    public static void drawBlackPerspective(ChessGame game) {
+    public static void drawBlackPerspective(ChessGame game, ChessPosition position) {
         ChessBoard board = game.getBoard();
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, false);
         for (int row=1; row <= 8; row++) {
             for (int col=9; col>=0; col--) {
-                drawChessRow(out, board, row, col);
+                drawChessRow(out, board, row, col, null);
             }
             out.print(RESET_BG_COLOR);
             out.print("\n");
@@ -35,15 +36,21 @@ public class PrintBoard {
         drawTopOrBottomRow(out, false);
         out.print("\n");
     }
-
-    public static void drawWhitePerspective(ChessGame game) {
+    public static void drawWhitePerspective(ChessGame game, ChessPosition position) {
         ChessBoard board = game.getBoard();
+        HashSet<ChessPosition> validEndPositions = new HashSet<>();
+        if (position != null) {
+            Collection<ChessMove> validMoves = game.validMoves(position);
+            for (ChessMove move : validMoves) {
+                validEndPositions.add(move.getEndPosition());
+            }
+        }
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, true);
         for (int row=8; row >=1; row--) {
             for (int col=0; col<=9; col++) {
-                drawChessRow(out, board, row, col);
+                drawChessRow(out, board, row, col, validEndPositions);
             }
             out.print(RESET_BG_COLOR);
             out.print("\n");
@@ -52,14 +59,20 @@ public class PrintBoard {
         out.print("\n");
     }
 
-    private static void drawChessRow(PrintStream out, ChessBoard board, int row, int col) {
+
+    private static void drawChessRow(PrintStream out, ChessBoard board, int row, int col, HashSet<ChessPosition> validMoves) {
         if (col == 0 || col == 9) {
             out.print(SET_BG_COLOR_LIGHT_GREY);
             out.print(SET_TEXT_COLOR_BLACK);
             out.printf(" %s\u3000", row);
         }
         boolean isWhiteSquare = (col + row) % 2 == 1;
-        out.print(isWhiteSquare ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+        if (validMoves != null && validMoves.contains(new ChessPosition(row, col))) {
+            out.print(isWhiteSquare ? SET_BG_COLOR_DARK_BLUE : SET_BG_COLOR_BLUE);
+        }
+        else {
+            out.print(isWhiteSquare ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+        }
 
         if (col > 0 && col < 9) {
             ChessPiece piece=board.getPiece(new ChessPosition(row, col));

@@ -1,4 +1,4 @@
-package ui;
+package client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
@@ -44,22 +45,56 @@ public class ChessClient {
         };
     }
 
-    private String highlightLegalMoves() {
-        return "";
+    private static ChessPosition formatPosition(String position) {
+        int row = 0;
+        int col = 0;
+        switch (position.charAt(0)) {
+            case ('a') -> col = 1;
+            case ('b') -> col = 2;
+            case ('c') -> col = 3;
+            case ('d') -> col = 4;
+            case ('e') -> col = 5;
+            case ('f') -> col = 6;
+            case ('g') -> col = 7;
+            case ('h') -> col = 8;
+        }
+        switch (position.charAt(1)) {
+            case ('1') -> row = 1;
+            case ('2') -> row = 2;
+            case ('3') -> row = 3;
+            case ('4') -> row = 4;
+            case ('5') -> row = 5;
+            case ('6') -> row = 6;
+            case ('7') -> row = 7;
+            case ('8') -> row = 8;
+        }
+        return new ChessPosition(row, col);
+    }
+
+    private String highlightLegalMoves(String... params) throws Exception {
+        if (params.length == 1) {
+            String position = params[0];
+            if (! position.matches("^[a-g][1-8]$")) {
+                return "Error: Position must be [a-g][1-8]";
+            }
+            ChessPosition piecePosition = formatPosition(position);
+            PrintBoard.drawWhitePerspective(new ChessGame(), piecePosition);
+            return "";
+        }
+        else {
+            throw new ResponseException("Error: Expected: <POSITION>");
+        }
     }
 
     private String forfeitGame() {
         return "";
     }
-
     private String makeMove(String[] params) {
         return "";
     }
-
     private String leaveGame() {
         return "";
     }
-
     private String drawChessBoard() {
         return "";
     }
@@ -132,12 +167,12 @@ public class ChessClient {
             ChessGame game = games.get(gameID);
 
             if (Objects.equals(joinRequest.playerColor(), "black")) {
-                PrintBoard.drawBlackPerspective(game);
+                PrintBoard.drawBlackPerspective(game, null);
             }
             else {
-                PrintBoard.drawWhitePerspective(game);
+                PrintBoard.drawWhitePerspective(game, null);
             }
-            state = State.PLAYINGGAME;
+            state = State.PLAYING;
             return "Joined successfully.";
         }
         throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
@@ -150,7 +185,7 @@ public class ChessClient {
             } catch (Exception ex) {
                 return "Error: incorrect parameter";
             }
-            PrintBoard.drawWhitePerspective(games.get(gameID));
+            PrintBoard.drawWhitePerspective(games.get(gameID), null);
             return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");
@@ -183,7 +218,7 @@ public class ChessClient {
                    -make move - input your move
                    -leave - leave the game
                    -resign - forfeit the game
-                   -highlight legal moves
+                   -highlight legal moves - choose a piece to see its legal moves
                     """;
         }
     }

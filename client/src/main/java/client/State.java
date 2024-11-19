@@ -1,7 +1,7 @@
-package ui;
+package client;
 
 public enum State {
     SIGNEDOUT,
     SIGNEDIN,
-    PLAYINGGAME
+    PLAYING
 }

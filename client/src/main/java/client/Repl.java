@@ -1,7 +1,7 @@
-package ui;
+package client;
 
 import java.util.Scanner;
-import static ui.EscapeSequences.*;
+import static client.EscapeSequences.*;
 
 public class Repl {
     private final ChessClient client;
