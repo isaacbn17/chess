@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.*;
 import model.*;
+import server.websocket.WebSocketHandler;
 import service.DeleteService;
 import service.GameService;
 import service.UserService;
@@ -17,10 +18,12 @@ public class Server {
     private AuthDAO authDAO = new MemoryAuthDAO();
 
     private final UserService userService;
-    private final DeleteService delete;
+    private final DeleteService deleteService;
     private final GameService gameService;
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public Server() {
+
         try {
             userDAO = new SQLUserDAO();
             gameDAO = new SQLGameDAO();
@@ -29,7 +32,7 @@ public class Server {
             System.out.println(ex);
         }
         this.userService = new UserService(userDAO, authDAO);
-        this.delete = new DeleteService(userDAO, gameDAO, authDAO);
+        this.deleteService = new DeleteService(userDAO, gameDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
@@ -37,6 +40,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::createUser);
@@ -52,7 +57,7 @@ public class Server {
         return Spark.port();
     }
 
-    public void exceptionHandler(Exception ex, Request req, Response res) {
+    private void exceptionHandler(Exception ex, Request req, Response res) {
         String message = ex.getMessage();
         switch (message) {
             case "Error: bad request" -> {
@@ -124,9 +129,9 @@ public class Server {
         }
     }
     private String deleteEverything(Request req, Response res) throws DataAccessException {
-        delete.clearUsers();
-        delete.clearGames();
-        delete.clearAuthTokens();
+        deleteService.clearUsers();
+        deleteService.clearGames();
+        deleteService.clearAuthTokens();
         res.status(200);
         return "";
     }

@@ -35,8 +35,33 @@ public class ChessClient {
             case "list" -> listGames();
             case "join" -> joinGame(params);
             case "observe" -> observeGame(params);
+            case "redraw chess board" -> drawChessBoard();
+            case "leave" -> leaveGame();
+            case "make move" -> makeMove(params);
+            case "resign" -> forfeitGame();
+            case "highlight legal moves" -> highlightLegalMoves();
             default -> help();
         };
+    }
+
+    private String highlightLegalMoves() {
+        return "";
+    }
+
+    private String forfeitGame() {
+        return "";
+    }
+
+    private String makeMove(String[] params) {
+        return "";
+    }
+
+    private String leaveGame() {
+        return "";
+    }
+
+    private String drawChessBoard() {
+        return "";
     }
 
     public String registerUser(String... params) throws Exception {
@@ -105,12 +130,14 @@ public class ChessClient {
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
             ChessGame game = games.get(gameID);
+
             if (Objects.equals(joinRequest.playerColor(), "black")) {
                 PrintBoard.drawBlackPerspective(game);
             }
             else {
                 PrintBoard.drawWhitePerspective(game);
             }
+            state = State.PLAYINGGAME;
             return "Joined successfully.";
         }
         throw new ResponseException("Error: Expected <ID> [WHITE|BLACK]");
@@ -134,11 +161,11 @@ public class ChessClient {
             return """
                     -register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                     -login <USERNAME> <PASSWORD> - to play chess
-                    -quit - playing chess
-                    -help - with possible commands
+                    -quit - stop playing chess
+                    -help - list possible commands
                      """;
         }
-        else {
+        else if (state == State.SIGNEDIN) {
             return """
                     -create <GAME NAME> - create a game
                     -list - list games
@@ -146,7 +173,17 @@ public class ChessClient {
                     -observe <ID> - observe a game
                     -logout - when you are done
                     -quit - stop playing chess
-                    -help - with possible commands
+                    -help - list possible commands
+                    """;
+        }
+        else {
+            return """
+                   -help - list possible commands
+                   -redraw chess board
+                   -make move - input your move
+                   -leave - leave the game
+                   -resign - forfeit the game
+                   -highlight legal moves
                     """;
         }
     }

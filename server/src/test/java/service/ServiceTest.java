@@ -87,7 +87,7 @@ class ServiceTest {
         var expected = new UserData("a", "b", "c.com");
         userDAO.addUser(expected);
         var actual=userDAO.getUser("a");
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
     @Test
     public void registerUserBadRequest() {
