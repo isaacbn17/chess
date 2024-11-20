@@ -16,24 +16,23 @@ public class Server {
     private UserDAO userDAO = new MemoryUserDAO();
     private GameDAO gameDAO = new MemoryGameDAO();
     private AuthDAO authDAO = new MemoryAuthDAO();
+    private final WebSocketHandler webSocketHandler;
 
     private final UserService userService;
     private final DeleteService deleteService;
     private final GameService gameService;
-    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public Server() {
-
         try {
             userDAO = new SQLUserDAO();
             gameDAO = new SQLGameDAO();
             authDAO = new SQLAuthDAO();
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
+        } catch (Exception ex) { System.out.println(ex); }
+
         this.userService = new UserService(userDAO, authDAO);
-        this.deleteService = new DeleteService(userDAO, gameDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
+        this.deleteService = new DeleteService(userDAO, gameDAO, authDAO);
+        webSocketHandler = new WebSocketHandler(userDAO,  gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
