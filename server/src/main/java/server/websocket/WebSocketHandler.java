@@ -1,9 +1,6 @@
 package server.websocket;
 
 import com.google.gson.Gson;
-import dataaccess.SQLAuthDAO;
-import dataaccess.SQLGameDAO;
-import dataaccess.SQLUserDAO;
 import dataaccess.*;
 import model.AuthData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
