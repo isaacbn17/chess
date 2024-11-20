@@ -2,11 +2,11 @@ package client.websocket;
 
 
 //import org.glassfish.grizzly.http.server.Session;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
-
-import javax.management.Notification;
 import javax.websocket.*;
 import java.net.URI;
 
@@ -34,6 +34,17 @@ public class WebSocketFacade {
         }
         catch (Exception ex) {
             throw new ResponseException(ex.getMessage());
+        }
+    }
+
+    public void joinGame(String authToken, Integer gameID, ChessGame.TeamColor color) throws Exception {
+        try {
+            UserGameCommand userGameCommand = new UserGameCommand
+                    (UserGameCommand.CommandType.CONNECT, authToken, gameID, color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        }
+        catch (Exception ex) {
+
         }
     }
 

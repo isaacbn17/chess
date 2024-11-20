@@ -12,6 +12,7 @@ import client.websocket.WebSocketFacade;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
+import websocket.commands.UserGameCommand;
 
 public class ChessClient {
 
@@ -113,7 +114,6 @@ public class ChessClient {
             RegisterResult registerResult = server.createUser(userData);
             authToken = registerResult.authToken();
             state = State.SIGNEDIN;
-            ws = new WebSocketFacade(serverUrl, notificationHandler);
             return String.format("You're signed in as: %s", registerResult.username());
         }
         throw new ResponseException("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");
@@ -173,12 +173,16 @@ public class ChessClient {
             }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+
             ChessGame game = games.get(gameID);
 
             if (Objects.equals(joinRequest.playerColor(), "black")) {
+                ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
                 PrintBoard.drawBlackPerspective(game, null);
             }
             else {
+                ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
                 PrintBoard.drawWhitePerspective(game, null);
             }
             state = State.PLAYING;

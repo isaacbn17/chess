@@ -1,13 +1,19 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
+import javax.management.Notification;
 import java.io.IOException;
 
 @WebSocket
@@ -41,6 +47,30 @@ public class WebSocketHandler {
         }
     }
 
+    private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        connections.add(username, session);
+        NotificationMessage notificationMessage = getNotificationMessage(username, command);
+        connections.broadcast(username, notificationMessage);
+
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+        connections.selfBroadcast(username, gameMessage);
+    }
+
+    private static NotificationMessage getNotificationMessage(String username, UserGameCommand command) {
+        String message;
+        if (command.getColor() == null) {
+            message = String.format("%s is observing the game", username);
+        }
+        else if (command.getColor() == ChessGame.TeamColor.WHITE) {
+            message = String.format("%s joined the game as white", username);
+        }
+        else {
+            message = String.format("%s joined the game as black", username);
+        }
+        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+    }
+
     private void resign(Session session, String username, UserGameCommand command) {
     }
 
@@ -48,11 +78,6 @@ public class WebSocketHandler {
     }
 
     private void makeMove(Session session, String username, UserGameCommand command) {
-    }
-
-    private void connect(Session session, String username, UserGameCommand command) {
-
-        
     }
 
     private void saveSession(Integer gameID, Session session) {
