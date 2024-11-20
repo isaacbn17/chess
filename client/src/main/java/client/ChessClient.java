@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import chess.ChessGame;
 import chess.ChessPosition;
+import client.websocket.WebSocketFacade;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
@@ -14,13 +15,16 @@ import server.ServerFacade;
 public class ChessClient {
 
     private final ServerFacade server;
+    private final String serverUrl;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
     private final HashMap<Integer, Integer> gameIDtoNumber = new HashMap<>();
     private final HashMap<Integer, ChessGame> games = new HashMap<>();
+    private WebSocketFacade ws;
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
+        this.serverUrl = serverURL;
     }
 
     public String eval(String input) throws Exception {
@@ -105,6 +109,7 @@ public class ChessClient {
             RegisterResult registerResult = server.createUser(userData);
             authToken = registerResult.authToken();
             state = State.SIGNEDIN;
+            ws = new WebSocketFacade(serverUrl);
             return String.format("You're signed in as: %s", registerResult.username());
         }
         throw new ResponseException("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");

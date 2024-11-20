@@ -1,5 +1,7 @@
 package client;
 
+import websocket.messages.ServerMessage;
+
 import java.util.Scanner;
 import static client.EscapeSequences.*;
 
@@ -28,6 +30,10 @@ public class Repl {
             }
         }
         System.out.println();
+    }
+
+    public void notify(ServerMessage message) {
+        System.out.print(SET_TEXT_COLOR_WHITE + message.toString());
     }
 
 }
