@@ -177,14 +177,11 @@ public class ChessClient {
             server.joinGame(joinRequest, authToken);
             ws = new WebSocketFacade(serverUrl, notificationHandler);
 
-//            ChessGame game = games.get(gameID);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
                 ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
-//                PrintBoard.drawBlackPerspective(game, null);
             }
             else {
                 ws.joinGame(authToken, gameID, ChessGame.TeamColor.WHITE);
-//                PrintBoard.drawWhitePerspective(game, null);
             }
             state = State.PLAYING;
             return "Joined successfully.";

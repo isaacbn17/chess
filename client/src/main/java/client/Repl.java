@@ -48,6 +48,7 @@ public class Repl implements NotificationHandler {
                     PrintBoard.drawWhitePerspective(game, null);
                 }
                 else {
+                    System.out.println("\n");
                     PrintBoard.drawBlackPerspective(game, null);
                 }
             }
