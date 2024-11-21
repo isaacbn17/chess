@@ -6,11 +6,12 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 import javax.websocket.*;
 import java.net.URI;
 
-public class WebSocketFacade {
+public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
@@ -26,8 +27,7 @@ public class WebSocketFacade {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(serverMessage);
+                    notificationHandler.notify(message);
                 }
             });
 
@@ -44,13 +44,12 @@ public class WebSocketFacade {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         }
         catch (Exception ex) {
-
+            System.out.println(ex);
         }
     }
 
-//    @Override
-//    public void onOpen(Session session, EndpointConfig endpointConfig) {
-//    }
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
 
-
+    }
 }

@@ -4,9 +4,25 @@ import chess.ChessGame;
 
 public class LoadGameMessage extends ServerMessage {
     ChessGame game;
+    ChessGame.TeamColor color;
 
-    public LoadGameMessage(ServerMessageType type, ChessGame game) {
+    public LoadGameMessage(ServerMessageType type, ChessGame game, ChessGame.TeamColor color) {
         super(type);
         this.game = game;
+        this.color = color;
+    }
+
+    public ChessGame getGame() {
+        return game;
+    }
+    public ChessGame.TeamColor getColor() {
+        return color;
+    }
+
+    @Override
+    public String toString() {
+        return "LoadGameMessage{" +
+                "game=" + game +
+                '}';
     }
 }

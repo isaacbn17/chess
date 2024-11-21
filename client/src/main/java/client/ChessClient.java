@@ -160,6 +160,7 @@ public class ChessClient {
                     .append(game.blackUsername())
                     .append("\n\n");
             gameIDtoNumber.put(game.gameID(), i);
+            i++;
         }
         return gamesString.toString();
     }
@@ -167,7 +168,8 @@ public class ChessClient {
         if (params.length == 2) {
             int gameID;
             try {
-                gameID = gameIDtoNumber.get(Integer.parseInt(params[0]));
+                int gameNumber = Integer.parseInt(params[0]);
+                gameID = gameIDtoNumber.get(gameNumber);
             } catch (Exception ex) {
                 return "Error: incorrect parameter";
             }
@@ -175,15 +177,14 @@ public class ChessClient {
             server.joinGame(joinRequest, authToken);
             ws = new WebSocketFacade(serverUrl, notificationHandler);
 
-            ChessGame game = games.get(gameID);
-
+//            ChessGame game = games.get(gameID);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
                 ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
-                PrintBoard.drawBlackPerspective(game, null);
+//                PrintBoard.drawBlackPerspective(game, null);
             }
             else {
-                ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
-                PrintBoard.drawWhitePerspective(game, null);
+                ws.joinGame(authToken, gameID, ChessGame.TeamColor.WHITE);
+//                PrintBoard.drawWhitePerspective(game, null);
             }
             state = State.PLAYING;
             return "Joined successfully.";

@@ -8,6 +8,7 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -32,6 +33,9 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+            if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
+                MoveCommand moveCommand = new Gson().fromJson(message, MoveCommand.class);
+            }
 
             String username = getUsername(command.getAuthToken());
 //            saveSession(command.getGameID(), session);
@@ -53,7 +57,7 @@ public class WebSocketHandler {
         connections.broadcast(username, notificationMessage);
 
         GameData gameData = gameDAO.getGame(command.getGameID());
-        LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+        LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
         connections.selfBroadcast(username, gameMessage);
     }
 

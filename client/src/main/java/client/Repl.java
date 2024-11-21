@@ -1,6 +1,9 @@
 package client;
 
+import chess.ChessGame;
 import client.websocket.NotificationHandler;
+import com.google.gson.Gson;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -33,8 +36,23 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    public void notify(ServerMessage message) {
-        System.out.print(SET_TEXT_COLOR_YELLOW + message.toString());
+    public void notify(String message) {
+        ServerMessage.ServerMessageType type = new Gson().fromJson(message, ServerMessage.class).getServerMessageType();
+        switch (type) {
+            case LOAD_GAME -> {
+                LoadGameMessage gameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                ChessGame game = gameMessage.getGame();
+                ChessGame.TeamColor color = gameMessage.getColor();
+                if (color == ChessGame.TeamColor.WHITE) {
+                    System.out.println("\n");
+                    PrintBoard.drawWhitePerspective(game, null);
+                }
+                else {
+                    PrintBoard.drawBlackPerspective(game, null);
+                }
+            }
+        }
+//        System.out.print(SET_TEXT_COLOR_YELLOW + message.toString());
         System.out.print(SET_TEXT_COLOR_WHITE + "\n" +  ">>> ");
     }
 

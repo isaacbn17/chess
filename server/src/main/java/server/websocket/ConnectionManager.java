@@ -1,6 +1,7 @@
 package server.websocket;
 
 //import javax.websocket.Session;
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
@@ -40,7 +41,9 @@ public class ConnectionManager {
     public void selfBroadcast(String username, LoadGameMessage gameMessage) throws IOException {
         for (Connection c : connections.values()) {
             if (c.username.equals(username)) {
-                c.send(gameMessage.toString());
+//                c.send("Sending a message to user");
+                String jsonMessage = new Gson().toJson(gameMessage);
+                c.send(jsonMessage);
             }
         }
     }
