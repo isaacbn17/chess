@@ -52,7 +52,7 @@ public class ChessClient {
             case "leave" -> leaveGame();
             case "move" -> makeMove(params);
             case "resign" -> forfeitGame();
-            case "highlight" -> highlightLegalMoves();
+            case "highlight" -> highlightLegalMoves(params);
             default -> help();
         };
     }
@@ -90,8 +90,7 @@ public class ChessClient {
                 return "Error: Position must be [a-g][1-8]";
             }
             ChessPosition piecePosition = formatPosition(position);
-            ws.highlightLegalMoves(piecePosition);
-//            PrintBoard.drawWhitePerspective(new ChessGame(), piecePosition);
+            ws.highlightLegalMoves(authToken, playerGameID, playerColor, piecePosition);
             return "";
         }
         else {
@@ -103,8 +102,8 @@ public class ChessClient {
         if (params.length >= 2) {
             String start = params[0];
             String end = params[1];
-            if (! start.matches("^[a-g][1-8]$") && ! end.matches("^[a-g][1-8]$")) {
-                return "Error: Positions must be [a-g][1-8]";
+            if (! start.matches("^[a-h][1-8]$") && ! end.matches("^[a-h][1-8]$")) {
+                return "Error: Positions must be [a-h][1-8]";
             }
             ChessPiece.PieceType promotionPiece = null;
             if (params.length == 3) {

@@ -47,11 +47,11 @@ public class Repl implements NotificationHandler {
                 ChessGame.TeamColor color = gameMessage.getColor();
                 if (color == ChessGame.TeamColor.BLACK) {
                     System.out.println("\n");
-                    PrintBoard.drawBlackPerspective(game, null);
+                    PrintBoard.drawBlackPerspective(game, gameMessage.highlightPosition());
                 }
                 else {
                     System.out.println("\n");
-                    PrintBoard.drawWhitePerspective(game, null);
+                    PrintBoard.drawWhitePerspective(game, gameMessage.highlightPosition());
                 }
             }
             case NOTIFICATION ->  {

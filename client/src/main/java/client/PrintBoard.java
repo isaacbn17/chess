@@ -4,7 +4,6 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -18,17 +17,30 @@ public class PrintBoard {
         System.out.println("White perspective:\n");
         drawWhitePerspective(game, new ChessPosition(2, 2));
         System.out.println(SET_TEXT_COLOR_WHITE + "Black perspective:\n");
-        drawBlackPerspective(game, null);
+        drawBlackPerspective(game, new ChessPosition(7, 3));
+    }
+    private static HashSet<ChessPosition> getValidEndPositions(ChessGame game, ChessPosition position) {
+        if (position != null) {
+            HashSet<ChessPosition> positions = new HashSet<>();
+            Collection<ChessMove> validMoves = game.validMoves(position);
+            for (ChessMove move : validMoves) {
+                positions.add(move.getEndPosition());
+            }
+            return positions;
+        }
+        return null;
     }
 
     public static void drawBlackPerspective(ChessGame game, ChessPosition position) {
         ChessBoard board = game.getBoard();
+        HashSet<ChessPosition> validEndPositions = getValidEndPositions(game, position);
+
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, false);
         for (int row=1; row <= 8; row++) {
             for (int col=9; col>=0; col--) {
-                drawChessRow(out, board, row, col, null);
+                drawChessRow(out, board, row, col, validEndPositions);
             }
             out.print(RESET_BG_COLOR);
             out.print("\n");
@@ -36,15 +48,11 @@ public class PrintBoard {
         drawTopOrBottomRow(out, false);
         out.print("\n");
     }
+
     public static void drawWhitePerspective(ChessGame game, ChessPosition position) {
         ChessBoard board = game.getBoard();
-        HashSet<ChessPosition> validEndPositions = new HashSet<>();
-        if (position != null) {
-            Collection<ChessMove> validMoves = game.validMoves(position);
-            for (ChessMove move : validMoves) {
-                validEndPositions.add(move.getEndPosition());
-            }
-        }
+        HashSet<ChessPosition> validEndPositions = getValidEndPositions(game, position);
+
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawTopOrBottomRow(out, true);

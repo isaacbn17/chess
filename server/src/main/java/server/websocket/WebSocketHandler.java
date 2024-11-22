@@ -8,6 +8,7 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.commands.DisplayCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -41,10 +42,19 @@ public class WebSocketHandler {
                 case MAKE_MOVE -> makeMove(session, username, new Gson().fromJson(message, MoveCommand.class));
                 case LEAVE -> leaveGame(session, username, command);
                 case RESIGN -> resign(session, username, command);
+                case DISPLAY -> display(session, username, new Gson().fromJson(message, DisplayCommand.class));
             }
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
         }
+    }
+
+
+    private void display(Session session, String username, DisplayCommand command) throws DataAccessException, IOException {
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        LoadGameMessage gameMessage = new LoadGameMessage(
+                ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), command.getPosition());
+        connections.broadcastGameSelf(username, gameMessage);
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
@@ -53,7 +63,8 @@ public class WebSocketHandler {
         connections.broadcastNotification(username, notificationMessage, session);
 
         GameData gameData = gameDAO.getGame(command.getGameID());
-        LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
+        LoadGameMessage gameMessage = new LoadGameMessage(
+                ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
         connections.broadcastGameSelf(username, gameMessage);
     }
     private static NotificationMessage getConnectMessage(String username, UserGameCommand command) {
@@ -92,7 +103,7 @@ public class WebSocketHandler {
         try {
             gameData.game().makeMove(command.getMove());
             gameDAO.updateGame(gameData.gameID(), gameData.game());
-            LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
+            LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
             connections.broadcastGame(gameMessage, session);
 
             NotificationMessage notificationMessage = getMoveMessage(username, command);
