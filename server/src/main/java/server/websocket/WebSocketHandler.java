@@ -17,6 +17,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -58,14 +59,32 @@ public class WebSocketHandler {
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
-        connections.add(username, session);
-        NotificationMessage notificationMessage = getConnectMessage(username, command);
-        connections.broadcastNotification(username, notificationMessage, session);
+        try {
+            connections.add(username, session);
+            if (! Objects.equals(username, authDAO.getAuthData(command.getAuthToken()).username())) {
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect authorization token");
+                connections.broadcastError(username, errorMessage);
+                return;
+            }
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            if (gameData == null) {
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect game ID");
+                connections.broadcastError(username, errorMessage);
+                return;
+            }
 
-        GameData gameData = gameDAO.getGame(command.getGameID());
-        LoadGameMessage gameMessage = new LoadGameMessage(
-                ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
-        connections.broadcastGameSelf(username, gameMessage);
+            NotificationMessage notificationMessage = getConnectMessage(username, command);
+            connections.broadcastNotification(username, notificationMessage, session);
+
+            LoadGameMessage gameMessage = new LoadGameMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
+            connections.broadcastGameSelf(username, gameMessage);
+
+        } catch (Exception ex) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage());
+            connections.broadcastError(username, errorMessage);
+        }
+
     }
     private static NotificationMessage getConnectMessage(String username, UserGameCommand command) {
         String message;
@@ -126,8 +145,13 @@ public class WebSocketHandler {
     private String getUsername(String authToken) throws DataAccessException {
         try {
             AuthData authData = authDAO.getAuthData(authToken);
+            if (authData == null) {
+                ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect authorization token");
+                connections.broadcastError("d", errorMessage);
+                return "";
+            }
             return authData.username();
-        } catch (DataAccessException ex) {
+        } catch (Exception ex) {
             throw new DataAccessException("Error: unauthorized");
         }
     }
