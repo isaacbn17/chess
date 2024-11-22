@@ -17,7 +17,7 @@ public class PrintBoard {
         System.out.println("White perspective:\n");
         drawWhitePerspective(game, new ChessPosition(2, 2));
         System.out.println(SET_TEXT_COLOR_WHITE + "Black perspective:\n");
-        drawBlackPerspective(game, new ChessPosition(7, 3));
+        drawBlackPerspective(game, new ChessPosition(8, 2));
     }
     private static HashSet<ChessPosition> getValidEndPositions(ChessGame game, ChessPosition position) {
         if (position != null) {
@@ -76,7 +76,7 @@ public class PrintBoard {
         }
         boolean isWhiteSquare = (col + row) % 2 == 1;
         if (validMoves != null && validMoves.contains(new ChessPosition(row, col))) {
-            out.print(isWhiteSquare ? SET_BG_COLOR_DARK_BLUE : SET_BG_COLOR_BLUE);
+            out.print(isWhiteSquare ? SET_BG_COLOR_LIGHT_ORANGE : SET_BG_COLOR_ORANGE);
         }
         else {
             out.print(isWhiteSquare ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);

@@ -97,6 +97,10 @@ public class ChessClient {
             throw new ResponseException("Error: Expected: <POSITION>");
         }
     }
+    private String drawChessBoard() throws ResponseException {
+        ws.drawBoard(authToken, playerGameID, playerColor);
+        return "";
+    }
 
     private String makeMove(String[] params) throws ResponseException {
         if (params.length >= 2) {
@@ -144,9 +148,6 @@ public class ChessClient {
     private String leaveGame() throws ResponseException {
         ws.leaveGame(authToken, playerGameID, playerColor);
         state = State.SIGNEDIN;
-        return "";
-    }
-    private String drawChessBoard() {
         return "";
     }
 

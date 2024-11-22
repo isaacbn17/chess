@@ -92,4 +92,14 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(ex.getMessage());
         }
     }
+
+    public void drawBoard(String authToken, int gameID, ChessGame.TeamColor color) throws ResponseException {
+        try {
+            DisplayCommand highlightCommand =
+                    new DisplayCommand(UserGameCommand.CommandType.DISPLAY, authToken, gameID, color, null);
+            this.session.getBasicRemote().sendText(new Gson().toJson(highlightCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
 }
