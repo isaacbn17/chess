@@ -3,6 +3,7 @@ package client;
 import chess.ChessGame;
 import client.websocket.NotificationHandler;
 import com.google.gson.Gson;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
@@ -51,6 +52,10 @@ public class Repl implements NotificationHandler {
                     System.out.println("\n");
                     PrintBoard.drawWhitePerspective(game, null);
                 }
+            }
+            case ERROR -> {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.printf("\nError: %s", errorMessage.getMessage());
             }
         }
 //        System.out.print(SET_TEXT_COLOR_YELLOW + message.toString());

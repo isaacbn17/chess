@@ -48,11 +48,11 @@ public class ChessClient {
             case "list" -> listGames();
             case "join" -> joinGame(params);
             case "observe" -> observeGame(params);
-            case "redraw chess board" -> drawChessBoard();
+            case "redraw" -> drawChessBoard();
             case "leave" -> leaveGame();
             case "move" -> makeMove(params);
             case "resign" -> forfeitGame();
-            case "highlight legal moves" -> highlightLegalMoves();
+            case "highlight" -> highlightLegalMoves();
             default -> help();
         };
     }
@@ -122,7 +122,6 @@ public class ChessClient {
             throw new ResponseException("Error: Expected <START_POSITION> <END_POSITION> <PROMOTION_PIECE>");
         }
     }
-
     private ChessPiece.PieceType formatPromotionPiece(String piece) throws ResponseException {
         switch (piece) {
             case "queen" -> {
@@ -267,11 +266,11 @@ public class ChessClient {
         else {
             return """
                    -help - list possible commands
-                   -redraw chess board
-                   -move - input your move
+                   -redraw - draw the chess board again
+                   -move <START POSITION> <END POSITION> <PROMOTION PIECE> - input your move
                    -leave - leave the game
                    -resign - forfeit the game
-                   -highlight legal moves - choose a piece to see its legal moves
+                   -highlight <START POSITION> - choose a piece and highlight its legal moves
                     """;
         }
     }

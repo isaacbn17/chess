@@ -80,17 +80,18 @@ public class WebSocketHandler {
         // Handles errors such as invalid move or not your turn
         try {
             gameData.game().makeMove(command.getMove());
+            gameDAO.updateGame(gameData.gameID(), gameData.game());
+            LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
+            connections.broadcastGame(gameMessage, session);
+
+            NotificationMessage notificationMessage = getMoveMessage(username, command);
+            connections.broadcastNotification(username, notificationMessage, session);
+
         } catch (InvalidMoveException ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage());
             connections.broadcastError(username, errorMessage);
         }
 
-        gameDAO.updateGame(gameData.gameID(), gameData.game());
-        LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
-        connections.broadcastGame(gameMessage, session);
-
-        NotificationMessage notificationMessage = getMoveMessage(username, command);
-        connections.broadcastNotification(username, notificationMessage, session);
     }
     private NotificationMessage getMoveMessage(String username, MoveCommand command) {
         ChessMove move = command.getMove();

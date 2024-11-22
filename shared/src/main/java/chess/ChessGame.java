@@ -76,13 +76,12 @@ import java.util.HashSet;
             if (board.getPiece(move.getStartPosition()) == null) {
                 throw new InvalidMoveException("Invalid move");
             }
-            Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-            if (validMoves == null) {
-                throw new InvalidMoveException("Invalid move");
-            }
-
             TeamColor color = board.getPiece(move.getStartPosition()).getTeamColor();
-            if (getTeamTurn() == color && validMoves.contains(move)) {
+            if (getTeamTurn() != color) {
+                throw new InvalidMoveException("It's not your turn");
+            }
+            Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+            if (validMoves.contains(move)) {
                 ChessPiece piece = board.getPiece(move.getStartPosition());
                 if (move.getPromotionPiece() != null) {
                     ChessPiece promotionPiece = new ChessPiece(color, move.getPromotionPiece());
