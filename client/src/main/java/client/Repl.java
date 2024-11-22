@@ -43,13 +43,13 @@ public class Repl implements NotificationHandler {
                 LoadGameMessage gameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                 ChessGame game = gameMessage.getGame();
                 ChessGame.TeamColor color = gameMessage.getColor();
-                if (color == ChessGame.TeamColor.WHITE) {
+                if (color == ChessGame.TeamColor.BLACK) {
                     System.out.println("\n");
-                    PrintBoard.drawWhitePerspective(game, null);
+                    PrintBoard.drawBlackPerspective(game, null);
                 }
                 else {
                     System.out.println("\n");
-                    PrintBoard.drawBlackPerspective(game, null);
+                    PrintBoard.drawWhitePerspective(game, null);
                 }
             }
         }

@@ -23,6 +23,7 @@ public class WebSocketHandler {
     private UserDAO userDAO;
     private GameDAO gameDAO;
     private AuthDAO authDAO;
+    private MoveCommand moveCommand;
 
     public WebSocketHandler(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
@@ -34,8 +35,9 @@ public class WebSocketHandler {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
-                MoveCommand moveCommand = new Gson().fromJson(message, MoveCommand.class);
+                moveCommand = new Gson().fromJson(message, MoveCommand.class);
             }
+
 
             String username = getUsername(command.getAuthToken());
 //            saveSession(command.getGameID(), session);
@@ -64,13 +66,13 @@ public class WebSocketHandler {
     private static NotificationMessage getNotificationMessage(String username, UserGameCommand command) {
         String message;
         if (command.getColor() == null) {
-            message = String.format("%s is observing the game", username);
+            message = String.format("%s is observing the game.", username);
         }
         else if (command.getColor() == ChessGame.TeamColor.WHITE) {
-            message = String.format("%s joined the game as white", username);
+            message = String.format("%s joined the game as white.", username);
         }
         else {
-            message = String.format("%s joined the game as black", username);
+            message = String.format("%s joined the game as black.", username);
         }
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
     }

@@ -3,6 +3,8 @@ package client.websocket;
 
 //import org.glassfish.grizzly.http.server.Session;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
@@ -30,12 +32,13 @@ public class WebSocketFacade extends Endpoint {
                     notificationHandler.notify(message);
                 }
             });
-
         }
         catch (Exception ex) {
             throw new ResponseException(ex.getMessage());
         }
     }
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
     public void joinGame(String authToken, Integer gameID, ChessGame.TeamColor color) throws Exception {
         try {
@@ -48,8 +51,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    public void makeChessMove(ChessMove move) {
+
+    }
+    public void highlightLegalMoves(ChessPosition piecePosition) {
 
     }
 }

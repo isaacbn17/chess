@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
@@ -20,8 +22,8 @@ public class ChessClient {
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
+//    private String playerColor = "";
     private final HashMap<Integer, Integer> gameIDtoNumber = new HashMap<>();
-    private final HashMap<Integer, ChessGame> games = new HashMap<>();
     private WebSocketFacade ws;
     private final NotificationHandler notificationHandler;
 
@@ -87,7 +89,8 @@ public class ChessClient {
                 return "Error: Position must be [a-g][1-8]";
             }
             ChessPosition piecePosition = formatPosition(position);
-            PrintBoard.drawWhitePerspective(new ChessGame(), piecePosition);
+            ws.highlightLegalMoves(piecePosition);
+//            PrintBoard.drawWhitePerspective(new ChessGame(), piecePosition);
             return "";
         }
         else {
@@ -98,9 +101,45 @@ public class ChessClient {
     private String forfeitGame() {
         return "";
     }
-    private String makeMove(String[] params) {
-        return "";
+    private String makeMove(String[] params) throws ResponseException {
+        if (params.length >= 2) {
+            String start = params[0];
+            String end = params[1];
+            if (! start.matches("^[a-g][1-8]$") && ! end.matches("^[a-g][1-8]$")) {
+                return "Error: Positions must be [a-g][1-8]";
+            }
+            ChessPiece.PieceType promotionPiece = null;
+            if (params.length == 3) {
+                promotionPiece = formatPromotionPiece(params[2]);
+            }
+            ChessPosition startPosition = formatPosition(start);
+            ChessPosition endPosition = formatPosition(end);
+            ws.makeChessMove(new ChessMove(startPosition, endPosition, promotionPiece));
+            return "";
+        }
+        else {
+            throw new ResponseException("Error: Expected <START_POSITION> <END_POSITION> <PROMOTION_PIECE>");
+        }
     }
+
+    private ChessPiece.PieceType formatPromotionPiece(String piece) throws ResponseException {
+        switch (piece) {
+            case "queen" -> {
+                return ChessPiece.PieceType.QUEEN;
+            }
+            case "bishop" -> {
+                return ChessPiece.PieceType.BISHOP;
+            }
+            case "knight" -> {
+                return ChessPiece.PieceType.KNIGHT;
+            }
+            case "rook" -> {
+                return ChessPiece.PieceType.ROOK;
+            }
+            default -> throw new ResponseException("Error: Promotion pieces are queen, bishop, knight, and rook.");
+        }
+    }
+
     private String leaveGame() {
         return "";
     }
@@ -139,9 +178,8 @@ public class ChessClient {
     private String createGame(String... params) throws Exception {
         if (params.length == 1) {
             GameName gameName = new GameName(params[0]);
-            int gameID = Integer.parseInt(server.createGame(gameName, authToken).toString());
+            server.createGame(gameName, authToken);
 //            gameIDtoNumber.put(gameID, gameIDtoNumber.size()+1);
-            games.put(gameID, new ChessGame());
             return "You've created a game.";
         }
         throw new ResponseException("Error: Expected: <GAME NAME>");
@@ -175,8 +213,9 @@ public class ChessClient {
             }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
-            ws = new WebSocketFacade(serverUrl, notificationHandler);
+//            playerColor = joinRequest.playerColor();
 
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
                 ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
             }
@@ -196,7 +235,8 @@ public class ChessClient {
             } catch (Exception ex) {
                 return "Error: incorrect parameter";
             }
-            PrintBoard.drawWhitePerspective(games.get(gameID), null);
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            ws.joinGame(authToken, gameID, null);
             return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");
