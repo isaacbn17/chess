@@ -63,6 +63,16 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(ex.getMessage());
         }
     }
+    public void forfeitGame(String authToken, int gameID, ChessGame.TeamColor color) throws ResponseException {
+        try {
+            UserGameCommand userCommand = new UserGameCommand (UserGameCommand.CommandType.RESIGN, authToken, gameID, color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userCommand));
+            this.session.close();
+        }
+        catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
 
     public void makeChessMove(String authToken, int gameID, ChessGame.TeamColor color, ChessMove move) {
         try {

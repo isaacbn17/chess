@@ -70,8 +70,16 @@ public class WebSocketHandler {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
     }
 
-    private void resign(Session session, String username, UserGameCommand command) {
+    private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        String winningColor = command.getColor() == ChessGame.TeamColor.WHITE ? "black" : "white";
+        connections.remove(username);
 
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        gameData.game().endGame();
+        gameDAO.updateGame(gameData.gameID(), gameData.game());
+
+        NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s resigned. %s wins!", username, winningColor));
+        connections.broadcastNotification(username, message, session);
     }
     private void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
         connections.remove(username);
@@ -80,7 +88,7 @@ public class WebSocketHandler {
     }
     private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(command.getGameID());
-        // Handles errors such as invalid move or not your turn
+        // Handles errors such as invalid move and not your turn
         try {
             gameData.game().makeMove(command.getMove());
             gameDAO.updateGame(gameData.gameID(), gameData.game());

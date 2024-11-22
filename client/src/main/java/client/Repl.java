@@ -5,6 +5,7 @@ import client.websocket.NotificationHandler;
 import com.google.gson.Gson;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -52,6 +53,10 @@ public class Repl implements NotificationHandler {
                     System.out.println("\n");
                     PrintBoard.drawWhitePerspective(game, null);
                 }
+            }
+            case NOTIFICATION ->  {
+                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.printf("\n%s", notificationMessage);
             }
             case ERROR -> {
                 ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);

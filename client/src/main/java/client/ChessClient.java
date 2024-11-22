@@ -99,9 +99,6 @@ public class ChessClient {
         }
     }
 
-    private String forfeitGame() {
-        return "";
-    }
     private String makeMove(String[] params) throws ResponseException {
         if (params.length >= 2) {
             String start = params[0];
@@ -140,8 +137,14 @@ public class ChessClient {
         }
     }
 
+    private String forfeitGame() throws ResponseException {
+        ws.forfeitGame(authToken, playerGameID, playerColor);
+        state = State.SIGNEDIN;
+        return "";
+    }
     private String leaveGame() throws ResponseException {
         ws.leaveGame(authToken, playerGameID, playerColor);
+        state = State.SIGNEDIN;
         return "";
     }
     private String drawChessBoard() {

@@ -4,12 +4,16 @@ import java.util.Collection;
 import java.util.HashSet;
 
     public class ChessGame {
+        private boolean gameActive = true;
         private TeamColor teamTurn = TeamColor.WHITE;
         private ChessBoard board = new ChessBoard();
         public ChessGame() {
             board.resetBoard();
         }
 
+        public void endGame() {
+            gameActive = false;
+        }
         public TeamColor getTeamTurn() {
             return teamTurn;
         }
@@ -73,6 +77,9 @@ import java.util.HashSet;
             }
         }
         public void makeMove(ChessMove move) throws InvalidMoveException {
+            if (! gameActive) {
+                throw new InvalidMoveException("The game has ended");
+            }
             if (board.getPiece(move.getStartPosition()) == null) {
                 throw new InvalidMoveException("Invalid move");
             }
