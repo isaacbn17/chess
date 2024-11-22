@@ -3,7 +3,6 @@ package server.websocket;
 import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
-import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -11,12 +10,12 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -51,13 +50,12 @@ public class WebSocketHandler {
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         connections.add(username, session);
         NotificationMessage notificationMessage = getConnectMessage(username, command);
-        connections.broadcast(username, notificationMessage);
+        connections.broadcastNotification(username, notificationMessage, session);
 
         GameData gameData = gameDAO.getGame(command.getGameID());
         LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
-        connections.selfBroadcast(username, gameMessage);
+        connections.broadcastGameSelf(username, gameMessage);
     }
-
     private static NotificationMessage getConnectMessage(String username, UserGameCommand command) {
         String message;
         if (command.getColor() == null) {
@@ -71,22 +69,29 @@ public class WebSocketHandler {
         }
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
     }
+
     private void resign(Session session, String username, UserGameCommand command) {
+
     }
     private void leaveGame(Session session, String username, UserGameCommand command) {
     }
-    private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException, InvalidMoveException, ResponseException {
+    private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(command.getGameID());
-        gameData.game().makeMove(command.getMove());
-        gameDAO.updateGame(gameData.gameID(), gameData.game());
+        // Handles errors such as invalid move or not your turn
+        try {
+            gameData.game().makeMove(command.getMove());
+        } catch (InvalidMoveException ex) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage());
+            connections.broadcastError(username, errorMessage);
+        }
 
+        gameDAO.updateGame(gameData.gameID(), gameData.game());
         LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor());
-        connections.broadcastGame(gameMessage);
+        connections.broadcastGame(gameMessage, session);
 
         NotificationMessage notificationMessage = getMoveMessage(username, command);
-        connections.broadcast(username, notificationMessage);
+        connections.broadcastNotification(username, notificationMessage, session);
     }
-
     private NotificationMessage getMoveMessage(String username, MoveCommand command) {
         ChessMove move = command.getMove();
         ChessPosition start = move.getStartPosition();
