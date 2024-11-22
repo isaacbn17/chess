@@ -56,7 +56,7 @@ public class Repl implements NotificationHandler {
             }
             case NOTIFICATION ->  {
                 NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
-                System.out.printf("\n%s", notificationMessage);
+                System.out.printf("\n%s", notificationMessage.getMessage());
             }
             case ERROR -> {
                 ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);

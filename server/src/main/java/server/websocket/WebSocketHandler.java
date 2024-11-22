@@ -36,7 +36,10 @@ public class WebSocketHandler {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
-            String username = getUsername(command.getAuthToken());
+            String username = getUsername(session, command.getAuthToken());
+            if (username == null) {
+                return;
+            }
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
@@ -55,34 +58,35 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(command.getGameID());
         LoadGameMessage gameMessage = new LoadGameMessage(
                 ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), command.getPosition());
-        connections.broadcastGameSelf(username, gameMessage);
+        connections.broadcastGameSelf(username, command.getGameID(), gameMessage);
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         try {
-            connections.add(username, session);
+            int gameID = command.getGameID();
+            connections.add(username, gameID, session);
             if (! Objects.equals(username, authDAO.getAuthData(command.getAuthToken()).username())) {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect authorization token");
-                connections.broadcastError(username, errorMessage);
+                connections.broadcastError(username, gameID, errorMessage);
                 return;
             }
-            GameData gameData = gameDAO.getGame(command.getGameID());
+            GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect game ID");
-                connections.broadcastError(username, errorMessage);
+                connections.broadcastError(username, gameID, errorMessage);
                 return;
             }
 
             NotificationMessage notificationMessage = getConnectMessage(username, command);
-            connections.broadcastNotification(username, notificationMessage, session);
+            connections.broadcastNotification(username, gameID, notificationMessage, session);
 
             LoadGameMessage gameMessage = new LoadGameMessage(
                     ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
-            connections.broadcastGameSelf(username, gameMessage);
+            connections.broadcastGameSelf(username, gameID, gameMessage);
 
         } catch (Exception ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage());
-            connections.broadcastError(username, errorMessage);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
         }
 
     }
@@ -102,35 +106,36 @@ public class WebSocketHandler {
 
     private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         String winningColor = command.getColor() == ChessGame.TeamColor.WHITE ? "black" : "white";
-        connections.remove(username);
+        connections.remove(command.getGameID(), username);
 
         GameData gameData = gameDAO.getGame(command.getGameID());
         gameData.game().endGame();
         gameDAO.updateGame(gameData.gameID(), gameData.game());
 
         NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s resigned. %s wins!", username, winningColor));
-        connections.broadcastNotification(username, message, session);
+        connections.broadcastNotification(username, command.getGameID(), message, session);
     }
     private void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
-        connections.remove(username);
+        connections.remove(command.getGameID(), username);
         NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s left the game", username));
-        connections.broadcastNotification(username, message, session);
+        connections.broadcastNotification(username, command.getGameID(), message, session);
     }
     private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
-        GameData gameData = gameDAO.getGame(command.getGameID());
+        int gameID = command.getGameID();
+        GameData gameData = gameDAO.getGame(gameID);
         // Handles errors such as invalid move and not your turn
         try {
             gameData.game().makeMove(command.getMove());
             gameDAO.updateGame(gameData.gameID(), gameData.game());
             LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
-            connections.broadcastGame(gameMessage, session);
+            connections.broadcastGame(gameID, gameMessage, session);
 
             NotificationMessage notificationMessage = getMoveMessage(username, command);
-            connections.broadcastNotification(username, notificationMessage, session);
+            connections.broadcastNotification(username, gameID, notificationMessage, session);
 
         } catch (InvalidMoveException ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage());
-            connections.broadcastError(username, errorMessage);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
         }
 
     }
@@ -142,13 +147,13 @@ public class WebSocketHandler {
         return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
     }
 
-    private String getUsername(String authToken) throws DataAccessException {
+    private String getUsername(Session session, String authToken) throws DataAccessException {
         try {
             AuthData authData = authDAO.getAuthData(authToken);
-            if (authData == null) {
+            if (authData== null) {
                 ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: incorrect authorization token");
-                connections.broadcastError("d", errorMessage);
-                return "";
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return null;
             }
             return authData.username();
         } catch (Exception ex) {
