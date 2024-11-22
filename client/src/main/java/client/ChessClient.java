@@ -140,7 +140,8 @@ public class ChessClient {
         }
     }
 
-    private String leaveGame() {
+    private String leaveGame() throws ResponseException {
+        ws.leaveGame(authToken, playerGameID, playerColor);
         return "";
     }
     private String drawChessBoard() {

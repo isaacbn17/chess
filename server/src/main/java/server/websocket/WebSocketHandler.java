@@ -73,7 +73,10 @@ public class WebSocketHandler {
     private void resign(Session session, String username, UserGameCommand command) {
 
     }
-    private void leaveGame(Session session, String username, UserGameCommand command) {
+    private void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
+        connections.remove(username);
+        NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s left the game", username));
+        connections.broadcastNotification(username, message, session);
     }
     private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(command.getGameID());
