@@ -33,7 +33,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData updateGames(int gameID, String color, String username) {
+    public GameData addPlayer(int gameID, String color, String username) {
         GameData game = games.get(gameID);
         GameData newGame;
         if (color.equalsIgnoreCase("WHITE")) {
@@ -44,6 +44,10 @@ public class MemoryGameDAO implements GameDAO {
         }
         games.put(gameID, newGame);
         return games.get(gameID);
+    }
+
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
     }
 
 }

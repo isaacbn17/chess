@@ -49,12 +49,12 @@ public class GameService {
         if (color.equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null && ! game.whiteUsername().equals(authData.username()))
                 { throw new DataAccessException("Error: already taken"); }
-            return gameDAO.updateGames(game.gameID(), "WHITE", authData.username());
+            return gameDAO.addPlayer(game.gameID(), "WHITE", authData.username());
         }
         else if (color.equalsIgnoreCase("BLACK")) {
             if (game.blackUsername() != null && ! game.blackUsername().equals(authData.username()))
                 { throw new DataAccessException("Error: already taken"); }
-            return gameDAO.updateGames(game.gameID(), "BLACK", authData.username());
+            return gameDAO.addPlayer(game.gameID(), "BLACK", authData.username());
         }
         else {
             throw new DataAccessException("Error: bad request");

@@ -27,7 +27,8 @@ public class ConnectionManager {
         for (Connection c : connections.values()) {
             if (c.session.isOpen()) {
                 if (! c.username.equals(excludeUser)) {
-                    c.send(serverMessage.toString());
+                    String jsonMessage = new Gson().toJson(serverMessage);
+                    c.send(jsonMessage);
                 }
             }
             else {
@@ -36,6 +37,14 @@ public class ConnectionManager {
         }
         for (Connection c : removeList) {
             connections.remove(c.username);
+        }
+    }
+    public void broadcastGame(LoadGameMessage gameMessage) throws IOException {
+        for (Connection c : connections.values()) {
+            if (c.session.isOpen()) {
+                String jsonMessage = new Gson().toJson(gameMessage);
+                c.send(jsonMessage);
+            }
         }
     }
     public void selfBroadcast(String username, LoadGameMessage gameMessage) throws IOException {

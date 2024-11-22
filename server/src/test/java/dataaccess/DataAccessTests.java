@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -134,13 +133,13 @@ public class DataAccessTests {
     }
     @Test void updateGames() throws DataAccessException {
         GameData gameData = gameDAO.addGame("Gaaaame");
-        GameData gameData1 = gameDAO.updateGames(gameData.gameID(), "WHITE", "Deborah");
+        GameData gameData1 = gameDAO.addPlayer(gameData.gameID(), "WHITE", "Deborah");
         assertEquals(gameData1.whiteUsername(), "Deborah");
         gameDAO.clear();
     }
     @Test void updateGamesFailure() throws DataAccessException {
         GameData gameData = gameDAO.addGame("Gaaaame");
-        gameDAO.updateGames(300, "WHITE", "Deborah");
+        gameDAO.addPlayer(300, "WHITE", "Deborah");
         assertNotEquals(gameData.whiteUsername(), "Deborah");
         gameDAO.clear();
     }

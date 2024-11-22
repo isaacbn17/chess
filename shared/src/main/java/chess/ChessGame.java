@@ -72,8 +72,6 @@ import java.util.HashSet;
                 return disappearingPiece;
             }
         }
-
-
         public void makeMove(ChessMove move) throws InvalidMoveException {
             if (board.getPiece(move.getStartPosition()) == null) {
                 throw new InvalidMoveException("Invalid move");

@@ -5,7 +5,18 @@ import java.util.Objects;
 public class ChessPosition {
 
   public String toString() {
-    return row + "" + col;
+    String c = "";
+    switch (col) {
+      case 1 -> c = "a";
+      case 2 -> c = "b";
+      case 3 -> c = "c";
+      case 4 -> c = "d";
+      case 5 -> c = "e";
+      case 6 -> c = "f";
+      case 7 -> c = "g";
+      case 8 -> c = "h";
+    }
+    return c + row;
   }
   public boolean equals(Object o) {
     if (this == o) {return true;}

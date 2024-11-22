@@ -22,7 +22,8 @@ public class ChessClient {
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
-//    private String playerColor = "";
+    private ChessGame.TeamColor playerColor;
+    private int playerGameID;
     private final HashMap<Integer, Integer> gameIDtoNumber = new HashMap<>();
     private WebSocketFacade ws;
     private final NotificationHandler notificationHandler;
@@ -49,7 +50,7 @@ public class ChessClient {
             case "observe" -> observeGame(params);
             case "redraw chess board" -> drawChessBoard();
             case "leave" -> leaveGame();
-            case "make move" -> makeMove(params);
+            case "move" -> makeMove(params);
             case "resign" -> forfeitGame();
             case "highlight legal moves" -> highlightLegalMoves();
             default -> help();
@@ -114,7 +115,7 @@ public class ChessClient {
             }
             ChessPosition startPosition = formatPosition(start);
             ChessPosition endPosition = formatPosition(end);
-            ws.makeChessMove(new ChessMove(startPosition, endPosition, promotionPiece));
+            ws.makeChessMove(authToken, playerGameID, playerColor, new ChessMove(startPosition, endPosition, promotionPiece));
             return "";
         }
         else {
@@ -213,7 +214,8 @@ public class ChessClient {
             }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
-//            playerColor = joinRequest.playerColor();
+            playerColor = Objects.equals(joinRequest.playerColor(), "white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            playerGameID = gameID;
 
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
@@ -266,7 +268,7 @@ public class ChessClient {
             return """
                    -help - list possible commands
                    -redraw chess board
-                   -make move - input your move
+                   -move - input your move
                    -leave - leave the game
                    -resign - forfeit the game
                    -highlight legal moves - choose a piece to see its legal moves

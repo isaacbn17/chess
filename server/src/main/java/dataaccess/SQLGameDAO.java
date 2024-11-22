@@ -96,7 +96,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData updateGames(int gameID, String color, String username) throws DataAccessException {
+    public GameData addPlayer(int gameID, String color, String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             if (color.equals("WHITE")) {
                 try (var ps = conn.prepareStatement("UPDATE game SET whiteUser=? WHERE id=?")) {
@@ -115,6 +115,20 @@ public class SQLGameDAO implements GameDAO {
                 }
             }
         } catch (Exception ex) {
+            throw new DataAccessException("Error: bad request");
+        }
+    }
+
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement("UPDATE game SET game=? WHERE id=?")) {
+                ps.setString(1, new Gson().toJson(game));
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }
+        }
+        catch (Exception ex) {
             throw new DataAccessException("Error: bad request");
         }
     }
