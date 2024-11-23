@@ -123,20 +123,28 @@ public class WebSocketHandler {
     }
     private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
-        TeamColor playerMakingMove = command.getColor();
-        TeamColor playerAttacked = playerMakingMove == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
         GameData gameData = gameDAO.getGame(gameID);
+        ChessGame game = gameDAO.getGame(gameID).game();
+        TeamColor teamTurn = game.getTeamTurn();
+        if (!Objects.equals(username, teamTurn == TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername())) {
+            String message = "Error: illegal to make a move for another player";
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
+            return;
+        }
+        TeamColor playerAttacked = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+
         // Handles errors such as invalid move and not your turn
         try {
-            gameData.game().makeMove(command.getMove());
-            gameDAO.updateGame(gameID, gameData.game());
-            LoadGameMessage gameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
+            game.makeMove(command.getMove());
+            gameDAO.updateGame(gameID, game);
+            LoadGameMessage gameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, command.getColor(), null);
             connections.broadcastGame(gameID, gameMessage, session);
 
             NotificationMessage notificationMessage = getMoveMessage(username, command);
             connections.broadcastNotification(username, true, gameID, notificationMessage, session);
 
-            checkGameStatusAndNotify(playerAttacked, username, gameData, gameID, session);
+            checkGameStatusAndNotify(playerAttacked, username, game, gameID, session);
 
         } catch (InvalidMoveException ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, ex.getMessage());
@@ -145,16 +153,16 @@ public class WebSocketHandler {
 
     }
 
-    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, GameData gameData, int gameID, Session session) throws IOException {
-        if (gameData.game().isInCheck(playerAttacked)) {
+    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, ChessGame game, int gameID, Session session) throws IOException {
+        if (game.isInCheck(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, true, false);
             connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
         }
-        else if (gameData.game().isInCheckmate(playerAttacked)) {
+        else if (game.isInCheckmate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, true);
             connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
         }
-        else if (gameData.game().isInStalemate(playerAttacked)) {
+        else if (game.isInStalemate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, false);
             connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
         }

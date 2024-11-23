@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
-import chess.ChessGame;
+import chess.ChessGame.TeamColor;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -14,7 +14,6 @@ import client.websocket.WebSocketFacade;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
-import websocket.commands.UserGameCommand;
 
 public class ChessClient {
 
@@ -22,7 +21,7 @@ public class ChessClient {
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
     private String authToken = "";
-    private ChessGame.TeamColor playerColor;
+    private TeamColor playerColor;
     private int playerGameID;
     private final HashMap<Integer, Integer> gameIDtoNumber = new HashMap<>();
     private WebSocketFacade ws;
@@ -217,15 +216,15 @@ public class ChessClient {
             }
             JoinRequest joinRequest = new JoinRequest(params[1], gameID);
             server.joinGame(joinRequest, authToken);
-            playerColor = Objects.equals(joinRequest.playerColor(), "white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            playerColor = Objects.equals(joinRequest.playerColor(), "white") ? TeamColor.WHITE : TeamColor.BLACK;
             playerGameID = gameID;
 
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             if (Objects.equals(joinRequest.playerColor(), "black")) {
-                ws.joinGame(authToken, gameID, ChessGame.TeamColor.BLACK);
+                ws.joinGame(authToken, gameID, TeamColor.BLACK);
             }
             else {
-                ws.joinGame(authToken, gameID, ChessGame.TeamColor.WHITE);
+                ws.joinGame(authToken, gameID, TeamColor.WHITE);
             }
             state = State.PLAYING;
             return "Joined successfully.";
