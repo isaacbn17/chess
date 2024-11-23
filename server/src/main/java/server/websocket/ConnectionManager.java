@@ -26,13 +26,13 @@ public class ConnectionManager {
             connectionList.removeIf(c -> Objects.equals(c.getUsername(), username));
         }
     }
-    public void broadcastNotification(String excludeUser, int gameID, NotificationMessage message, Session session) throws IOException {
+    public void broadcastNotification(String user, boolean excludeUser, int gameID, NotificationMessage message, Session session) throws IOException {
         ArrayList<Connection> removeList = new ArrayList<>();
         ArrayList<Connection> connectionList = connections.get(gameID);
+        String jsonMessage = new Gson().toJson(message);
         for (Connection c : connectionList) {
             if (c.session.isOpen()) {
-                if (! c.username.equals(excludeUser)) {
-                    String jsonMessage = new Gson().toJson(message);
+                if (! excludeUser || ! c.username.equals(user)) {
                     c.send(jsonMessage);
                 }
             }
@@ -47,7 +47,7 @@ public class ConnectionManager {
     public void broadcastGame(int gameID, LoadGameMessage gameMessage, Session session) throws IOException {
         ArrayList<Connection> connectionList = connections.get(gameID);
         for (Connection c : connectionList) {
-            if (c.session.isOpen() && c.session == session) {
+            if (c.session.isOpen()) {
                 String jsonMessage = new Gson().toJson(gameMessage);
                 c.send(jsonMessage);
             }
