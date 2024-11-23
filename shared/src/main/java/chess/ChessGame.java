@@ -14,6 +14,9 @@ import java.util.HashSet;
         public void endGame() {
             gameActive = false;
         }
+        public boolean gameOver() {
+            return !gameActive;
+        }
         public TeamColor getTeamTurn() {
             return teamTurn;
         }

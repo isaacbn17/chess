@@ -9,12 +9,8 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.commands.DisplayCommand;
-import websocket.commands.MoveCommand;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
+import websocket.commands.*;
+import websocket.messages.*;
 import websocket.messages.ServerMessage.ServerMessageType;
 
 import java.io.IOException;
@@ -106,17 +102,36 @@ public class WebSocketHandler {
     }
 
     private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDAO.getGame(gameID);
+        if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
+            String message = "Error: observers can't resign";
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
+            return;
+        }
+        if (gameData.game().gameOver()) {
+            String message = "Error: game is already over";
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
+            return;
+        }
         String winningColor = command.getColor() == TeamColor.WHITE ? "black" : "white";
-        connections.remove(command.getGameID(), username);
-
-        GameData gameData = gameDAO.getGame(command.getGameID());
         gameData.game().endGame();
         gameDAO.updateGame(gameData.gameID(), gameData.game());
 
         NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, String.format("%s resigned. %s wins!", username, winningColor));
         connections.broadcastNotification(username, false, command.getGameID(), message, session);
+        connections.remove(command.getGameID(), username);
     }
-    private void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
+    private void leaveGame(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDAO.getGame(gameID);
+
+
+//        gameDAO.updateGame(gameID, game);
+
+
         connections.remove(command.getGameID(), username);
         NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, String.format("%s left the game", username));
         connections.broadcastNotification(username, true, command.getGameID(), message, session);
