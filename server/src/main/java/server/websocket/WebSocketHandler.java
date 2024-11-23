@@ -19,12 +19,10 @@ import java.util.Objects;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-    private final UserDAO userDAO;
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
 
-    public WebSocketHandler(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
+    public WebSocketHandler(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
@@ -58,7 +56,7 @@ public class WebSocketHandler {
         connections.broadcastGameSelf(username, command.getGameID(), gameMessage);
     }
 
-    private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+    private void connect(Session session, String username, UserGameCommand command) throws IOException {
         try {
             int gameID = command.getGameID();
             connections.add(username, gameID, session);
@@ -120,7 +118,8 @@ public class WebSocketHandler {
         gameData.game().endGame();
         gameDAO.updateGame(gameData.gameID(), gameData.game());
 
-        NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, String.format("%s resigned. %s wins!", username, winningColor));
+        String stringMessage = String.format("%s resigned. %s wins!", username, winningColor);
+        NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, stringMessage);
         connections.broadcastNotification(username, false, command.getGameID(), message, session);
         connections.remove(command.getGameID(), username);
     }
