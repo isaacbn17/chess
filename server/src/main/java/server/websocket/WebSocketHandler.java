@@ -125,12 +125,15 @@ public class WebSocketHandler {
         connections.remove(command.getGameID(), username);
     }
     private void leaveGame(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
-        int gameID = command.getGameID();
-        GameData gameData = gameDAO.getGame(gameID);
-
-
-//        gameDAO.updateGame(gameID, game);
-
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        TeamColor color = Objects.equals(username, gameData.whiteUsername()) ? TeamColor.WHITE :
+                (Objects.equals(username, gameData.blackUsername()) ? TeamColor.BLACK : null);
+        if (color == TeamColor.WHITE) {
+            gameDAO.addPlayer(gameData.gameID(), "WHITE", null);
+        }
+        else if (color == TeamColor.BLACK) {
+            gameDAO.addPlayer(gameData.gameID(), "BLACK", null);
+        }
 
         connections.remove(command.getGameID(), username);
         NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, String.format("%s left the game", username));
@@ -141,6 +144,7 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameDAO.getGame(gameID).game();
         TeamColor teamTurn = game.getTeamTurn();
+
         if (!Objects.equals(username, teamTurn == TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername())) {
             String message = "Error: illegal to make a move for another player";
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
