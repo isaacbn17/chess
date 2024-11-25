@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ConnectionManager {
-//    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
     public final ConcurrentHashMap<Integer, ArrayList<Connection>> connections = new ConcurrentHashMap<>();
 
 
@@ -44,16 +43,17 @@ public class ConnectionManager {
             connectionList.remove(c);
         }
     }
-    public void broadcastGame(int gameID, LoadGameMessage gameMessage, Session session) throws IOException {
+    public void broadcastGame(int gameID, LoadGameMessage gameMessage, Session session, String opponentUsername) throws IOException {
         ArrayList<Connection> connectionList = connections.get(gameID);
         for (Connection c : connectionList) {
-            if (c.session.isOpen()) {
+            if (c.session.isOpen() && ! Objects.equals(c.getUsername(), opponentUsername)) {
                 String jsonMessage = new Gson().toJson(gameMessage);
                 c.send(jsonMessage);
             }
         }
     }
-    public void broadcastGameSelf(String username, int gameID, LoadGameMessage gameMessage) throws IOException {
+
+    public void broadcastGameSingle(String username, int gameID, LoadGameMessage gameMessage) throws IOException {
         ArrayList<Connection> connectionList = connections.get(gameID);
         for (Connection c : connectionList) {
             if (Objects.equals(c.getUsername(), username)) {

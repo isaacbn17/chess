@@ -53,7 +53,7 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(command.getGameID());
         LoadGameMessage gameMessage = new LoadGameMessage(
                 ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), command.getPosition());
-        connections.broadcastGameSelf(username, command.getGameID(), gameMessage);
+        connections.broadcastGameSingle(username, command.getGameID(), gameMessage);
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException {
@@ -77,7 +77,7 @@ public class WebSocketHandler {
 
             LoadGameMessage gameMessage = new LoadGameMessage(
                     ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
-            connections.broadcastGameSelf(username, gameID, gameMessage);
+            connections.broadcastGameSingle(username, gameID, gameMessage);
 
         } catch (Exception ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, ex.getMessage());
@@ -143,9 +143,11 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameDAO.getGame(gameID).game();
         TeamColor teamTurn = game.getTeamTurn();
+        String whiteUsername = gameData.whiteUsername();
+        String blackUsername = gameData.blackUsername();
 
-        if (!Objects.equals(username, teamTurn == TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername())) {
-            String message = "Error: illegal to make a move for another player";
+        if (!Objects.equals(username, teamTurn == TeamColor.WHITE ? whiteUsername : blackUsername)) {
+            String message = "Error: it's not your turn";
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
             connections.broadcastError(username, command.getGameID(), errorMessage);
             return;
@@ -156,8 +158,18 @@ public class WebSocketHandler {
         try {
             game.makeMove(command.getMove());
             gameDAO.updateGame(gameID, game);
+
             LoadGameMessage gameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, command.getColor(), null);
-            connections.broadcastGame(gameID, gameMessage, session);
+            if (teamTurn == TeamColor.WHITE) {
+                connections.broadcastGame(gameID, gameMessage, session, blackUsername);
+                LoadGameMessage blackGameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, TeamColor.BLACK, null);
+                connections.broadcastGameSingle(blackUsername, gameID, blackGameMessage);
+            }
+            else {
+                connections.broadcastGameSingle(username, gameID, gameMessage);
+                LoadGameMessage otherGameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, TeamColor.WHITE, null);
+                connections.broadcastGame(gameID, otherGameMessage, session, blackUsername);
+            }
 
             NotificationMessage notificationMessage = getMoveMessage(username, command);
             connections.broadcastNotification(username, true, gameID, notificationMessage, session);

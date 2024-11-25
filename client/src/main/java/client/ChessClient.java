@@ -38,22 +38,36 @@ public class ChessClient {
         String[] tokens = input.toLowerCase().split(" ");
         String command = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (command) {
-            case "quit" -> "quit";
-            case "register" -> registerUser(params);
-            case "login" -> loginUser(params);
-            case "logout" -> logoutUser();
-            case "create" -> createGame(params);
-            case "list" -> listGames();
-            case "join" -> joinGame(params);
-            case "observe" -> observeGame(params);
-            case "redraw" -> drawChessBoard();
-            case "leave" -> leaveGame();
-            case "move" -> makeMove(params);
-            case "resign" -> forfeitGame();
-            case "highlight" -> highlightLegalMoves(params);
-            default -> help();
-        };
+        if (state == State.SIGNEDOUT) {
+            return switch (command) {
+                case "quit" -> "quit";
+                case "register" -> registerUser(params);
+                case "login" -> loginUser(params);
+                default -> help();
+            };
+        }
+        else if (state == State.SIGNEDIN) {
+            return switch (command) {
+                case "quit" -> "quit";
+                case "create" -> createGame(params);
+                case "list" -> listGames();
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
+                case "logout" -> logoutUser();
+                default -> help();
+            };
+        }
+        else {
+            return switch (command) {
+                case "quit" -> "quit";
+                case "redraw" -> drawChessBoard();
+                case "move" -> makeMove(params);
+                case "leave" -> leaveGame();
+                case "resign" -> forfeitGame();
+                case "highlight" -> highlightLegalMoves(params);
+                default -> help();
+            };
+        }
     }
 
     private static ChessPosition formatPosition(String position) {

@@ -29,10 +29,10 @@ public class Repl implements NotificationHandler {
 
             try {
                 result = client.eval(line);
-                System.out.print(SET_TEXT_COLOR_GREEN + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable ex) {
-                String message = ex.toString();
-                System.out.print(message);
+//                System.out.print(ex.getMessage());
+                System.out.print("Error: not connected to server");
             }
         }
         System.out.println();

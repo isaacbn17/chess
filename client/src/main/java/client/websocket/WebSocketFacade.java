@@ -42,14 +42,14 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void joinGame(String authToken, Integer gameID, ChessGame.TeamColor color) throws Exception {
+    public void joinGame(String authToken, Integer gameID, ChessGame.TeamColor color) throws ResponseException {
         try {
             UserGameCommand userGameCommand = new UserGameCommand
                     (UserGameCommand.CommandType.CONNECT, authToken, gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         }
         catch (Exception ex) {
-            System.out.println(ex);
+            throw new ResponseException("Error: server connection has closed");
         }
     }
 
@@ -60,7 +60,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.close();
         }
         catch (IOException ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException("Error: server connection has closed");
         }
     }
     public void forfeitGame(String authToken, int gameID, ChessGame.TeamColor color) throws ResponseException {
@@ -70,7 +70,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.close();
         }
         catch (IOException ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException("Error: server connection has closed");
         }
     }
 
@@ -80,7 +80,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(moveCommand));
         }
         catch (Exception ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException("Error: server connection has closed");
         }
     }
     public void highlightLegalMoves(String authToken, int gameID, ChessGame.TeamColor color, ChessPosition piecePosition) throws ResponseException {
@@ -89,7 +89,7 @@ public class WebSocketFacade extends Endpoint {
                     new DisplayCommand(UserGameCommand.CommandType.DISPLAY, authToken, gameID, color, piecePosition);
             this.session.getBasicRemote().sendText(new Gson().toJson(highlightCommand));
         } catch (IOException ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException("Error: server connection has closed");
         }
     }
 
@@ -99,7 +99,7 @@ public class WebSocketFacade extends Endpoint {
                     new DisplayCommand(UserGameCommand.CommandType.DISPLAY, authToken, gameID, color, null);
             this.session.getBasicRemote().sendText(new Gson().toJson(highlightCommand));
         } catch (IOException ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException("Error: server connection has closed");
         }
     }
 }
