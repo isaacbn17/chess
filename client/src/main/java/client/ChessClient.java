@@ -1,9 +1,6 @@
 package client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import chess.ChessGame.TeamColor;
 import chess.ChessMove;
@@ -14,6 +11,9 @@ import client.websocket.WebSocketFacade;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
+
+import static client.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static client.EscapeSequences.SET_TEXT_COLOR_WHITE;
 
 public class ChessClient {
 
@@ -154,8 +154,17 @@ public class ChessClient {
     }
 
     private String forfeitGame() throws ResponseException {
-        ws.forfeitGame(authToken, playerGameID, playerColor);
-        state = State.SIGNEDIN;
+        System.out.print(SET_TEXT_COLOR_BLUE + "Are you sure you want to resign? (y/n)");
+        System.out.print(SET_TEXT_COLOR_WHITE + "\n" +  ">>> ");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (Objects.equals(line, "y")) {
+            ws.forfeitGame(authToken, playerGameID, playerColor);
+//            state = State.SIGNEDIN;
+        }
+        else {
+            System.out.print(SET_TEXT_COLOR_BLUE + "You did not resign from the game");
+        }
         return "";
     }
     private String leaveGame() throws ResponseException {
@@ -253,8 +262,12 @@ public class ChessClient {
             } catch (Exception ex) {
                 return "Error: incorrect parameter";
             }
+            playerGameID = gameID;
+            playerColor = TeamColor.WHITE;
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             ws.joinGame(authToken, gameID, null);
+
+            state = State.PLAYING;
             return "Observing game " + params[0];
         }
         throw new ResponseException("Error: Expected <ID>");

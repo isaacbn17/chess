@@ -31,8 +31,7 @@ public class Repl implements NotificationHandler {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable ex) {
-//                System.out.print(ex.getMessage());
-                System.out.print("Error: not connected to server");
+                System.out.print(ex.getMessage());
             }
         }
         System.out.println();
@@ -63,7 +62,6 @@ public class Repl implements NotificationHandler {
                 System.out.printf("\nError: %s", errorMessage.getMessage());
             }
         }
-//        System.out.print(SET_TEXT_COLOR_YELLOW + message.toString());
         System.out.print(SET_TEXT_COLOR_WHITE + "\n" +  ">>> ");
     }
 

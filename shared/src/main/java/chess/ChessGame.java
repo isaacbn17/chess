@@ -88,7 +88,7 @@ import java.util.HashSet;
             }
             TeamColor color = board.getPiece(move.getStartPosition()).getTeamColor();
             if (getTeamTurn() != color) {
-                throw new InvalidMoveException("It's not your turn");
+                throw new InvalidMoveException("It's not that color's turn");
             }
             Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
             if (validMoves.contains(move)) {

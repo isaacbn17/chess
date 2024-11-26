@@ -145,16 +145,21 @@ public class WebSocketHandler {
         TeamColor teamTurn = game.getTeamTurn();
         String whiteUsername = gameData.whiteUsername();
         String blackUsername = gameData.blackUsername();
-
+        if (game.gameOver()) {
+            String message = "The game has ended";
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
+            connections.broadcastError(username, command.getGameID(), errorMessage);
+            return;
+        }
         if (!Objects.equals(username, teamTurn == TeamColor.WHITE ? whiteUsername : blackUsername)) {
-            String message = "Error: it's not your turn";
+            String message = "It's not your turn";
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, message);
             connections.broadcastError(username, command.getGameID(), errorMessage);
             return;
         }
         TeamColor playerAttacked = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
 
-        // Handles errors such as invalid move and not your turn
+        // Handles errors such as invalid move
         try {
             game.makeMove(command.getMove());
             gameDAO.updateGame(gameID, game);
@@ -183,13 +188,24 @@ public class WebSocketHandler {
 
     }
 
-    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, ChessGame game, int gameID, Session session) throws IOException {
-        if (game.isInCheck(playerAttacked)) {
-            NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, true, false);
-            connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
-        }
-        else if (game.isInCheckmate(playerAttacked)) {
+    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, ChessGame game, int gameID,
+                                          Session session) throws IOException, DataAccessException {
+        if (game.isInCheckmate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, true);
+            connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
+
+            String winningColor = playerAttacked == TeamColor.WHITE ? "Black" : "White";
+            game.endGame();
+            gameDAO.updateGame(gameID, game);
+
+            String stringMessage = String.format("%s wins! The game is over.", winningColor);
+            NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, stringMessage);
+            connections.broadcastNotification(username, false, gameID, message, session);
+//            connections.remove(gameID, username);
+
+        }
+        else if (game.isInCheck(playerAttacked)) {
+            NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, true, false);
             connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
         }
         else if (game.isInStalemate(playerAttacked)) {
@@ -199,12 +215,12 @@ public class WebSocketHandler {
     }
 
     private NotificationMessage getGameStatusMessage(TeamColor playerAttacked, boolean check, boolean checkmate) {
-        if (check) {
-            String message = String.format("%s is in check", playerAttacked);
+        if (checkmate) {
+            String message = String.format("%s is in checkmate", playerAttacked);
             return new NotificationMessage(ServerMessageType.NOTIFICATION, message);
         }
-        else if (checkmate) {
-            String message = String.format("%s is in checkmate", playerAttacked);
+        else if (check) {
+            String message = String.format("%s is in check", playerAttacked);
             return new NotificationMessage(ServerMessageType.NOTIFICATION, message);
         }
         else {
