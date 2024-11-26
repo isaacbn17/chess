@@ -193,16 +193,8 @@ public class WebSocketHandler {
         if (game.isInCheckmate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, true);
             connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
-
-            String winningColor = playerAttacked == TeamColor.WHITE ? "Black" : "White";
             game.endGame();
             gameDAO.updateGame(gameID, game);
-
-            String stringMessage = String.format("%s wins! The game is over.", winningColor);
-            NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, stringMessage);
-            connections.broadcastNotification(username, false, gameID, message, session);
-//            connections.remove(gameID, username);
-
         }
         else if (game.isInCheck(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, true, false);
@@ -216,7 +208,8 @@ public class WebSocketHandler {
 
     private NotificationMessage getGameStatusMessage(TeamColor playerAttacked, boolean check, boolean checkmate) {
         if (checkmate) {
-            String message = String.format("%s is in checkmate", playerAttacked);
+            String winningColor = playerAttacked == TeamColor.WHITE ? "Black" : "White";
+            String message = String.format("%s is in checkmate. %s wins! The game is over.", playerAttacked, winningColor);
             return new NotificationMessage(ServerMessageType.NOTIFICATION, message);
         }
         else if (check) {
