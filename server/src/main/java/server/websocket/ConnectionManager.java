@@ -25,7 +25,7 @@ public class ConnectionManager {
             connectionList.removeIf(c -> Objects.equals(c.getUsername(), username));
         }
     }
-    public void broadcastNotification(String user, boolean excludeUser, int gameID, NotificationMessage message, Session session) throws IOException {
+    public void broadcastNotification(String user, boolean excludeUser, int gameID, NotificationMessage message) throws IOException {
         ArrayList<Connection> removeList = new ArrayList<>();
         ArrayList<Connection> connectionList = connections.get(gameID);
         String jsonMessage = new Gson().toJson(message);
@@ -43,7 +43,7 @@ public class ConnectionManager {
             connectionList.remove(c);
         }
     }
-    public void broadcastGame(int gameID, LoadGameMessage gameMessage, Session session, String opponentUsername) throws IOException {
+    public void broadcastGame(int gameID, LoadGameMessage gameMessage, String opponentUsername) throws IOException {
         ArrayList<Connection> connectionList = connections.get(gameID);
         for (Connection c : connectionList) {
             if (c.session.isOpen() && ! Objects.equals(c.getUsername(), opponentUsername)) {

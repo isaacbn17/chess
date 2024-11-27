@@ -38,10 +38,10 @@ public class WebSocketHandler {
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
-                case MAKE_MOVE -> makeMove(session, username, new Gson().fromJson(message, MoveCommand.class));
-                case LEAVE -> leaveGame(session, username, command);
-                case RESIGN -> resign(session, username, command);
-                case DISPLAY -> display(session, username, new Gson().fromJson(message, DisplayCommand.class));
+                case MAKE_MOVE -> makeMove(username, new Gson().fromJson(message, MoveCommand.class));
+                case LEAVE -> leaveGame(username, command);
+                case RESIGN -> resign(username, command);
+                case DISPLAY -> display(username, new Gson().fromJson(message, DisplayCommand.class));
             }
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
@@ -49,7 +49,7 @@ public class WebSocketHandler {
     }
 
 
-    private void display(Session session, String username, DisplayCommand command) throws DataAccessException, IOException {
+    private void display(String username, DisplayCommand command) throws DataAccessException, IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         LoadGameMessage gameMessage = new LoadGameMessage(
                 ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), command.getPosition());
@@ -73,7 +73,7 @@ public class WebSocketHandler {
             }
 
             NotificationMessage notificationMessage = getConnectMessage(username, command);
-            connections.broadcastNotification(username, true, gameID, notificationMessage, session);
+            connections.broadcastNotification(username, true, gameID, notificationMessage);
 
             LoadGameMessage gameMessage = new LoadGameMessage(
                     ServerMessageType.LOAD_GAME, gameData.game(), command.getColor(), null);
@@ -99,7 +99,7 @@ public class WebSocketHandler {
         return new NotificationMessage(ServerMessageType.NOTIFICATION, message);
     }
 
-    private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+    private void resign(String username, UserGameCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         GameData gameData = gameDAO.getGame(gameID);
         if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
@@ -120,10 +120,9 @@ public class WebSocketHandler {
 
         String stringMessage = String.format("%s resigned. %s wins!", username, winningColor);
         NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, stringMessage);
-        connections.broadcastNotification(username, false, command.getGameID(), message, session);
-        connections.remove(command.getGameID(), username);
+        connections.broadcastNotification(username, false, command.getGameID(), message);
     }
-    private void leaveGame(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+    private void leaveGame(String username, UserGameCommand command) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         TeamColor color = Objects.equals(username, gameData.whiteUsername()) ? TeamColor.WHITE :
                 (Objects.equals(username, gameData.blackUsername()) ? TeamColor.BLACK : null);
@@ -136,9 +135,9 @@ public class WebSocketHandler {
 
         connections.remove(command.getGameID(), username);
         NotificationMessage message = new NotificationMessage(ServerMessageType.NOTIFICATION, String.format("%s left the game", username));
-        connections.broadcastNotification(username, true, command.getGameID(), message, session);
+        connections.broadcastNotification(username, true, command.getGameID(), message);
     }
-    private void makeMove(Session session, String username, MoveCommand command) throws IOException, DataAccessException {
+    private void makeMove(String username, MoveCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameDAO.getGame(gameID).game();
@@ -166,20 +165,20 @@ public class WebSocketHandler {
 
             LoadGameMessage gameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, command.getColor(), null);
             if (teamTurn == TeamColor.WHITE) {
-                connections.broadcastGame(gameID, gameMessage, session, blackUsername);
+                connections.broadcastGame(gameID, gameMessage, blackUsername);
                 LoadGameMessage blackGameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, TeamColor.BLACK, null);
                 connections.broadcastGameSingle(blackUsername, gameID, blackGameMessage);
             }
             else {
                 connections.broadcastGameSingle(username, gameID, gameMessage);
                 LoadGameMessage otherGameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game, TeamColor.WHITE, null);
-                connections.broadcastGame(gameID, otherGameMessage, session, blackUsername);
+                connections.broadcastGame(gameID, otherGameMessage, blackUsername);
             }
 
             NotificationMessage notificationMessage = getMoveMessage(username, command);
-            connections.broadcastNotification(username, true, gameID, notificationMessage, session);
+            connections.broadcastNotification(username, true, gameID, notificationMessage);
 
-            checkGameStatusAndNotify(playerAttacked, username, game, gameID, session);
+            checkGameStatusAndNotify(playerAttacked, username, game, gameID);
 
         } catch (InvalidMoveException ex) {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessageType.ERROR, ex.getMessage());
@@ -188,21 +187,20 @@ public class WebSocketHandler {
 
     }
 
-    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, ChessGame game, int gameID,
-                                          Session session) throws IOException, DataAccessException {
+    private void checkGameStatusAndNotify(TeamColor playerAttacked, String username, ChessGame game, int gameID) throws IOException, DataAccessException {
         if (game.isInCheckmate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, true);
-            connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
+            connections.broadcastNotification(username, false, gameID, gameStatusMessage);
             game.endGame();
             gameDAO.updateGame(gameID, game);
         }
         else if (game.isInCheck(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, true, false);
-            connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
+            connections.broadcastNotification(username, false, gameID, gameStatusMessage);
         }
         else if (game.isInStalemate(playerAttacked)) {
             NotificationMessage gameStatusMessage = getGameStatusMessage(playerAttacked, false, false);
-            connections.broadcastNotification(username, false, gameID, gameStatusMessage, session);
+            connections.broadcastNotification(username, false, gameID, gameStatusMessage);
         }
     }
 
