@@ -65,7 +65,6 @@ public class WebSocketFacade extends Endpoint {
         try {
             UserGameCommand userCommand = new UserGameCommand (UserGameCommand.CommandType.RESIGN, authToken, gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(userCommand));
-//            this.session.close();
         }
         catch (IOException ex) {
             throw new ResponseException("Error: server connection has closed");

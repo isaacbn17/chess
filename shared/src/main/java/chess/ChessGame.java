@@ -139,10 +139,10 @@ import java.util.HashSet;
         }
         private void addPawnAttackMoves(int row, int col, ChessPiece piece, HashSet<ChessMove> moves) {
             if (piece.getTeamColor() == TeamColor.WHITE) {
-                moves.addAll(piece.captureWhite(board, new ChessPosition(row, col)));
+                moves.addAll(piece.capture(board, new ChessPosition(row, col), 1));
             }
             else {
-                moves.addAll(piece.captureBlack(board, new ChessPosition(row, col)));
+                moves.addAll(piece.capture(board, new ChessPosition(row, col), -1));
             }
         }
 

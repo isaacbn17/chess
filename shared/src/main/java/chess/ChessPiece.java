@@ -54,99 +54,48 @@ public class ChessPiece {
 
     private ArrayList<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (color) {
-            case WHITE -> whitePawn(board, myPosition);
-            case BLACK -> blackPawn(board, myPosition);
+            case WHITE -> pawn(board, myPosition, 2, 7, 1);
+            case BLACK -> pawn(board, myPosition, 7, 2, -1);
         };
     }
-    public ArrayList<ChessMove> captureBlack(ChessBoard board, ChessPosition myPosition) {
+    public ArrayList<ChessMove> capture(ChessBoard board, ChessPosition myPosition, int direction) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         if (col > 1) {
-            ChessPosition captureLeft = new ChessPosition(row-1, col-1);
-            if (board.getPiece(captureLeft) != null && board.getPiece(captureLeft).getTeamColor() != color) {
-                if (row-1 == 1) {
-                    moves.addAll(promotionPieces(myPosition, captureLeft));
-                } else {
-                    moves.add(new ChessMove(myPosition, captureLeft,null));
-                }
-            }
+            ChessPosition captureLeft = new ChessPosition(row + direction, col-1);
+            getCaptures(board, myPosition, direction, moves, row, captureLeft);
         }
         if (col < 8) {
-            ChessPosition captureRight=new ChessPosition(row-1, col+1);
-            if (board.getPiece(captureRight) != null && board.getPiece(captureRight).getTeamColor() != color) {
-                if (row-1 == 1) {
-                    moves.addAll(promotionPieces(myPosition, captureRight));
-                } else {
-                    moves.add(new ChessMove(myPosition, captureRight, null));
-                }
-            }
+            ChessPosition captureRight = new ChessPosition(row + direction, col+1);
+            getCaptures(board, myPosition, direction, moves, row, captureRight);
         }
         return moves;
     }
-    private ArrayList<ChessMove> blackPawn(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves=new ArrayList<>(captureBlack(board, myPosition));
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        ChessPosition newPosition = new ChessPosition(row-1, col);
-        if (board.getPiece(newPosition) == null) {
-            if (row==7) {
-                moves.add(new ChessMove(myPosition, newPosition, null));
-                ChessPosition secondPosition = new ChessPosition(row-2, col);
-                if (board.getPiece(secondPosition) == null) {
-                    moves.add(new ChessMove(myPosition, secondPosition, null));
-                }
-            }
-            if (row==2) {
-                moves.addAll(promotionPieces(myPosition, newPosition));
-                return moves;
-            }
-            moves.add(new ChessMove(myPosition, newPosition, null));
-            return moves;
-        }
-        return moves;
-    }
-    public ArrayList<ChessMove> captureWhite(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
 
-        if (col > 1) {
-            ChessPosition captureLeft = new ChessPosition(row+1, col-1);
-            if (board.getPiece(captureLeft) != null && board.getPiece(captureLeft).getTeamColor() != color) {
-                if (row+1 == 8) {
-                    moves.addAll(promotionPieces(myPosition, captureLeft));
-                } else {
-                    moves.add(new ChessMove(myPosition, captureLeft,null));
-                }
+    private void getCaptures(ChessBoard board, ChessPosition myPosition, int direction, ArrayList<ChessMove> moves, int row, ChessPosition capturePosition) {
+        if (board.getPiece(capturePosition) != null && board.getPiece(capturePosition).getTeamColor() != color) {
+            if (row + direction == 1 || row + direction == 8) {
+                moves.addAll(promotionPieces(myPosition, capturePosition));
+            } else {
+                moves.add(new ChessMove(myPosition, capturePosition, null));
             }
         }
-        if (col < 8) {
-            ChessPosition captureRight=new ChessPosition(row+1, col+1);
-            if (board.getPiece(captureRight) != null && board.getPiece(captureRight).getTeamColor() != color) {
-                if (row+1 == 8) {
-                    moves.addAll(promotionPieces(myPosition, captureRight));
-                } else {
-                    moves.add(new ChessMove(myPosition, captureRight, null));
-                }
-            }
-        }
-        return moves;
     }
-    private ArrayList<ChessMove> whitePawn(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>(captureWhite(board, myPosition));
+
+    private ArrayList<ChessMove> pawn(ChessBoard board, ChessPosition myPosition, int start, int end, int direction) {
+        ArrayList<ChessMove> moves=new ArrayList<>(capture(board, myPosition, direction));
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        ChessPosition newPosition = new ChessPosition(row+1, col);
+        ChessPosition newPosition = new ChessPosition(row + direction, col);
         if (board.getPiece(newPosition) == null) {
-            if (row==2) {
-                moves.add(new ChessMove(myPosition, newPosition, null));
-                ChessPosition secondPosition = new ChessPosition(row+2, col);
+            if (row == start) {
+                ChessPosition secondPosition = new ChessPosition(row + direction*2, col);
                 if (board.getPiece(secondPosition) == null) {
                     moves.add(new ChessMove(myPosition, secondPosition, null));
                 }
             }
-            if (row==7) {
+            else if (row == end) {
                 moves.addAll(promotionPieces(myPosition, newPosition));
                 return moves;
             }
@@ -155,6 +104,7 @@ public class ChessPiece {
         }
         return moves;
     }
+
     private ArrayList<ChessMove> promotionPieces(ChessPosition myPosition, ChessPosition newPosition) {
         ArrayList<ChessMove> pieces = new ArrayList<>();
         pieces.add(new ChessMove(myPosition, newPosition, PieceType.QUEEN));
@@ -164,7 +114,7 @@ public class ChessPiece {
         return pieces;
     }
 
-    private void singleMove(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> move) {
+    private void singleStep(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> move) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         if ((0 < row+x && row+x < 9) && (0 < col+y && col+y <9)) {
@@ -174,9 +124,9 @@ public class ChessPiece {
             }
         }
     }
-    private void severalMoves(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> moves) {
+    private void severalSteps(ChessBoard board, ChessPosition myPosition, int x, int y, ArrayList<ChessMove> moves) {
         int row = myPosition.getRow();
-        int col =myPosition.getColumn();
+        int col = myPosition.getColumn();
         while ((0 < row+x && row+x < 9) && (0 < col+y && col+y < 9)) {
             row += x;
             col += y;
@@ -190,35 +140,30 @@ public class ChessPiece {
                 moves.add(move);
                 break;
             }
-            else {
-                break;
-            }
+            else { break; }
         }
-
-
     }
+    
     private ArrayList<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        singleMove(board, myPosition, -1, -1, moves);
-        singleMove(board, myPosition, -1, 0, moves);
-        singleMove(board, myPosition, -1, 1, moves);
-        singleMove(board, myPosition, 0, -1, moves);
-        singleMove(board, myPosition, 0, 1, moves);
-        singleMove(board, myPosition, 1, -1, moves);
-        singleMove(board, myPosition, 1, 0, moves);
-        singleMove(board, myPosition, 1, 1, moves);
+        for (int i=-1; i<=1; i++) {
+            for (int j=-1; j<=1; j++) {
+                if (i != 0 || j != 0) {
+                    singleStep(board, myPosition, i, j, moves);
+                }
+            }
+        }
         return moves;
     }
     private ArrayList<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        singleMove(board, myPosition, 1, 2, moves);
-        singleMove(board, myPosition, 1, -2, moves);
-        singleMove(board, myPosition, 2, 1, moves);
-        singleMove(board, myPosition, 2, -1, moves);
-        singleMove(board, myPosition, -1, 2, moves);
-        singleMove(board, myPosition, -1, -2, moves);
-        singleMove(board, myPosition, -2, 1, moves);
-        singleMove(board, myPosition, -2, -1, moves);
+        for (int step : new int[]{-2, -1, 1, 2}) {
+            for (int step2 : new int[]{-2, -1, 1, 2}) {
+                if (Math.abs(step) != Math.abs(step2)) {
+                    singleStep(board, myPosition, step, step2, moves);
+                }
+            }
+        }
         return moves;
     }
     private ArrayList<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
@@ -229,18 +174,18 @@ public class ChessPiece {
     }
     private ArrayList<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        severalMoves(board, myPosition, -1, 0, moves);
-        severalMoves(board, myPosition, 1, 0, moves);
-        severalMoves(board, myPosition, 0, -1, moves);
-        severalMoves(board, myPosition, 0, 1, moves);
+        severalSteps(board, myPosition, -1, 0, moves);
+        severalSteps(board, myPosition, 1, 0, moves);
+        severalSteps(board, myPosition, 0, -1, moves);
+        severalSteps(board, myPosition, 0, 1, moves);
         return moves;
     }
     private ArrayList<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        severalMoves(board, myPosition, -1, -1, moves);
-        severalMoves(board, myPosition, -1, 1, moves);
-        severalMoves(board, myPosition, 1, -1, moves);
-        severalMoves(board, myPosition, 1, 1, moves);
+        severalSteps(board, myPosition, -1, -1, moves);
+        severalSteps(board, myPosition, -1, 1, moves);
+        severalSteps(board, myPosition, 1, -1, moves);
+        severalSteps(board, myPosition, 1, 1, moves);
         return moves;
     }
 }
